@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+/* -----------------------------------------------------------------------------
+   MyTailor design tokens
+   Warm neutrals (ivory → cream → sand) with near-black ink and a single
+   restrained cognac accent. Status colours are muted so they never compete
+   with photography.
+----------------------------------------------------------------------------- */
+@theme {
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-instrument), ui-serif, Georgia, serif;
+
+  --color-ivory: #faf7f2;
+  --color-paper: #fffdf9;
+  --color-cream: #f3ede3;
+  --color-sand: #e7decf;
+  --color-line: #e3dace;
+  --color-stone: #a39a8e;
+  --color-muted: #6b6358;
+  --color-charcoal: #2e2a26;
+  --color-ink: #1d1b18;
+
+  --color-accent: #8a5a2e;
+  --color-accent-strong: #6f4722;
+  --color-accent-soft: #f2e8da;
+
+  --color-success: #3f6b45;
+  --color-success-soft: #e7efe4;
+  --color-warning: #85601a;
+  --color-warning-soft: #f6eed9;
+  --color-danger: #a1392c;
+  --color-danger-soft: #f8e6e1;
+  --color-info: #3e5a73;
+  --color-info-soft: #e4ebf1;
+
+  --shadow-soft: 0 1px 2px rgb(29 27 24 / 0.04), 0 8px 24px -12px rgb(29 27 24 / 0.12);
+  --shadow-lift: 0 2px 4px rgb(29 27 24 / 0.05), 0 18px 40px -18px rgb(29 27 24 / 0.22);
+
+  --radius-card: 1.125rem;
+
+  --animate-fade-up: fade-up 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes shimmer {
+    from { background-position: -200% 0; }
+    to { background-position: 200% 0; }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background: var(--color-ivory);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background: var(--color-accent-soft);
+    color: var(--color-ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  input, textarea, select, button {
+    font: inherit;
+  }
+  /* Date inputs inherit colour in Safari */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0.6;
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  .eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--color-muted);
+  }
+  .skeleton {
+    background: linear-gradient(90deg, var(--color-cream) 0%, var(--color-sand) 50%, var(--color-cream) 100%);
+    background-size: 200% 100%;
+    animation: var(--animate-shimmer);
+    border-radius: 0.6rem;
+  }
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+  .scrollbar-none { scrollbar-width: none; }
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
