@@ -22,8 +22,8 @@ export function LinkTabs({
   label: string;
 }) {
   return (
-    <nav aria-label={label} className="-mx-4 mb-6 overflow-x-auto px-4 scrollbar-none sm:mx-0 sm:px-0">
-      <ul className="flex w-max gap-1 rounded-full border border-line bg-paper p-1">
+    <nav aria-label={label} className="-mx-4 mb-5 overflow-x-auto border-b border-line px-4 scrollbar-none sm:mx-0 sm:px-0">
+      <ul className="flex w-max gap-6">
         {tabs.map((t) => {
           const isActive = t.key === active;
           return (
@@ -33,14 +33,12 @@ export function LinkTabs({
                 aria-current={isActive ? "page" : undefined}
                 scroll={false}
                 className={cn(
-                  "flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold whitespace-nowrap transition",
-                  isActive ? "bg-ink text-ivory" : "text-muted hover:text-ink",
+                  "-mb-px flex items-center gap-1.5 border-b-2 pb-3 text-sm font-medium whitespace-nowrap transition",
+                  isActive ? "border-ink text-ink" : "border-transparent text-muted hover:text-ink",
                 )}
               >
                 {t.label}
-                {typeof t.count === "number" ? (
-                  <span className={cn("rounded-full px-1.5 text-xs", isActive ? "bg-ivory/15" : "bg-cream")}>{t.count}</span>
-                ) : null}
+                {typeof t.count === "number" ? <span className="text-xs text-stone tabular-nums">{t.count}</span> : null}
               </Link>
             </li>
           );

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Compass, Package, Plus } from "lucide-react";
 import { OrderCard } from "@/components/orders/order-card";
 import { ButtonLink } from "@/components/ui/button";
-import { PageHeader } from "@/components/ui/card";
+import { PageHeader, RowList } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/feedback";
 import { LinkTabs } from "@/components/ui/nav-bits";
 import { requireViewer } from "@/lib/auth";
@@ -26,13 +26,7 @@ export default async function OrdersPage({ searchParams }: PageProps<"/orders">)
   return (
     <>
       <PageHeader
-        eyebrow={role === "customer" ? "Customer" : "Tailor"}
         title="Orders"
-        description={
-          role === "customer"
-            ? "Garments being made for you. Each order has its own private chat with your tailor."
-            : "Work you’ve been chosen for. Move each order forward as you go."
-        }
       />
 
       {orders.length === 0 ? (
@@ -41,8 +35,8 @@ export default async function OrdersPage({ searchParams }: PageProps<"/orders">)
           title="No orders yet"
           description={
             role === "customer"
-              ? "When you choose a tailor’s offer, your request becomes an order and appears here."
-              : "When a customer accepts one of your offers, the order appears here."
+              ? "Choose an offer on one of your requests and it becomes an order."
+              : "When a customer accepts your offer, the order appears here."
           }
           action={
             role === "customer" ? (
@@ -63,11 +57,11 @@ export default async function OrdersPage({ searchParams }: PageProps<"/orders">)
             ]}
           />
           {shown.length ? (
-            <div className="grid gap-3 lg:grid-cols-2">
+            <RowList>
               {shown.map((o) => (
                 <OrderCard key={o.id} order={o} role={role} imageUrl={o.request?.image_path ? images.get(o.request.image_path) : null} />
               ))}
-            </div>
+            </RowList>
           ) : (
             <EmptyState
               compact

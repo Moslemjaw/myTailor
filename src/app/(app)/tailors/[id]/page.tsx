@@ -29,7 +29,7 @@ export default async function TailorProfilePage({ params }: PageProps<"/tailors/
         <aside>
           <Card className="p-6 sm:p-7">
             <Avatar name={profile.full_name} seed={profile.id} size="xl" />
-            <h1 className="mt-5 font-display text-4xl leading-tight text-ink">{profile.full_name}</h1>
+            <h1 className="mt-5 text-2xl font-semibold tracking-[-0.02em] text-ink">{profile.full_name}</h1>
             <p className="mt-1 text-sm text-muted">Tailor on MyTailor since {formatDate(profile.created_at, { day: undefined })}</p>
 
             <dl className="mt-6 grid grid-cols-3 gap-3 border-y border-line py-5 text-center">

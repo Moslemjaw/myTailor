@@ -59,9 +59,9 @@ export function OrderProgress({
                 {step.label}
                 <span className="sr-only">{done ? " — done" : active ? " — current stage" : " — upcoming"}</span>
               </p>
-              <p className="mt-0.5 text-xs leading-relaxed text-muted">
-                {ts ? `${formatDate(ts, { year: undefined })}, ${formatTime(ts)}` : active ? "Current stage" : step.description}
-              </p>
+              {ts || active ? (
+                <p className="mt-0.5 text-xs text-muted">{active && !done ? "Now" : `${formatDate(ts!, { year: undefined })}, ${formatTime(ts!)}`}</p>
+              ) : null}
             </div>
           </li>
         );

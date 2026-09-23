@@ -12,8 +12,8 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
 
   return (
     <>
-      <h1 className="font-display text-5xl leading-tight text-ink">Welcome back</h1>
-      <p className="mt-3 text-muted">Sign in to see your requests, offers and orders.</p>
+      <h1 className="text-2xl font-semibold tracking-[-0.02em] text-ink">Welcome back</h1>
+      
       {linkError ? (
         <Notice tone="warning" className="mt-6" title="That link didn’t work">
           It may have expired or already been used. Sign in, or request a new link.

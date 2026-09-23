@@ -11,8 +11,8 @@ export default function ForgotPasswordPage() {
       <Link href="/login" className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-muted hover:text-ink">
         <ArrowLeft className="size-4" aria-hidden /> Back to sign in
       </Link>
-      <h1 className="font-display text-5xl leading-tight text-ink">Forgot your password?</h1>
-      <p className="mt-3 text-muted">Enter your email and we’ll send you a link to choose a new one.</p>
+      <h1 className="text-2xl font-semibold tracking-[-0.02em] text-ink">Forgot your password?</h1>
+      <p className="mt-1.5 text-muted">Enter your email and we’ll send you a link to choose a new one.</p>
       <ForgotPasswordForm />
     </>
   );

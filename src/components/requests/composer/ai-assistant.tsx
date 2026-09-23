@@ -50,37 +50,34 @@ export function AiAssistant({
   return (
     <section
       aria-labelledby="ai-assistant-title"
-      className="rounded-3xl border border-accent/20 bg-gradient-to-b from-accent-soft/70 to-paper p-5 sm:p-6"
+      className="rounded-[var(--radius-card)] border border-line bg-paper p-5"
     >
       <div className="flex items-start gap-3">
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-paper text-accent ring-1 ring-accent/20">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent-strong">
           <Sparkles className="size-4" aria-hidden />
         </span>
         <div className="min-w-0 flex-1">
           <h3 id="ai-assistant-title" className="font-semibold text-ink">
             Description assistant
           </h3>
-          <p className="mt-0.5 text-sm leading-relaxed text-muted">
-            Get a suggested description from your reference photo. It’s only a starting point — you decide what goes in
-            your request.
-          </p>
+          <p className="mt-0.5 text-sm text-muted">A starting point from your photo. You decide what’s used.</p>
         </div>
       </div>
 
       <div className="mt-5" aria-live="polite">
         {!imagePath ? (
-          <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-sand bg-paper/70 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 rounded-xl bg-ivory p-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-muted">Add a reference photo to get a suggestion.</p>
             <Button variant="secondary" size="sm" icon={<ImagePlus className="size-4" />} onClick={onGoToImage}>
               Add a photo
             </Button>
           </div>
         ) : state.kind === "idle" ? (
-          <Button variant="accent" icon={<Sparkles className="size-4" />} onClick={run}>
+          <Button variant="secondary" icon={<Sparkles className="size-4" />} onClick={run}>
             Suggest a description
           </Button>
         ) : state.kind === "loading" || pending ? (
-          <div className="rounded-2xl border border-line bg-paper p-4" role="status">
+          <div className="rounded-xl bg-ivory p-4" role="status">
             <p className="flex items-center gap-2 text-sm font-medium text-ink">
               <Sparkles className="size-4 animate-pulse text-accent" aria-hidden />
               Studying the silhouette, fabric and details…
@@ -104,7 +101,7 @@ export function AiAssistant({
             {state.message}
           </Notice>
         ) : (
-          <div className="rounded-2xl border border-line bg-paper p-4 shadow-soft">
+          <div className="rounded-xl bg-ivory p-4">
             <div className="mb-2 flex items-center justify-between gap-2">
               <label htmlFor="ai-suggestion" className="text-xs font-semibold tracking-wide text-accent uppercase">
                 Suggestion — edit freely before using
@@ -123,7 +120,7 @@ export function AiAssistant({
               value={state.text}
               onChange={(e) => setState({ kind: "suggestion", text: e.target.value })}
               rows={7}
-              className="min-h-44 border-transparent bg-ivory/60 text-[0.92rem]"
+              className="min-h-44 bg-paper text-[0.92rem]"
             />
             <div className="mt-4 flex flex-wrap gap-2">
               {hasOwnDescription ? (

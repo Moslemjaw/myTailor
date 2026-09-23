@@ -62,7 +62,7 @@ export function Dialog({
       <div className="flex max-h-[92dvh] flex-col rounded-t-3xl border border-line bg-paper shadow-lift sm:rounded-3xl">
         <div className="flex items-start justify-between gap-4 px-6 pt-6 pb-2 sm:px-7 sm:pt-7">
           <div>
-            <h2 id={titleId} className="font-display text-[1.9rem] leading-tight text-ink">
+            <h2 id={titleId} className="text-xl font-semibold tracking-[-0.01em] text-ink">
               {title}
             </h2>
             {description ? (

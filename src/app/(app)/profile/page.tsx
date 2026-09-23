@@ -1,17 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ExternalLink, LogOut, ShieldCheck } from "lucide-react";
+import { ExternalLink, LogOut } from "lucide-react";
 import { signOut } from "@/actions/auth";
 import { ProfileForm } from "@/components/profile/profile-form";
 import { Avatar } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, PageHeader } from "@/components/ui/card";
 import { RatingSummary } from "@/components/ui/stars";
-import { StatTile } from "@/components/ui/stat";
 import { requireViewer } from "@/lib/auth";
 import { formatDate } from "@/lib/format";
-import { getCustomerRequests, getMyOffers, getOrders, getTailorStats } from "@/lib/queries";
+import { getTailorStats } from "@/lib/queries";
 
 export const metadata: Metadata = { title: "Profile" };
 
@@ -20,68 +18,37 @@ export default async function ProfilePage() {
   const { profile } = viewer;
   const isTailor = profile.role === "tailor";
 
-  const orders = await getOrders(viewer.id, profile.role);
-  const completed = orders.filter((o) => o.status === "completed").length;
-  const [requests, offers, stats] = await Promise.all([
-    isTailor ? Promise.resolve([]) : getCustomerRequests(viewer.id),
-    isTailor ? getMyOffers(viewer.id) : Promise.resolve([]),
-    isTailor ? getTailorStats([viewer.id]) : Promise.resolve(new Map()),
-  ]);
+  const stats = isTailor ? await getTailorStats([viewer.id]) : new Map();
   const myStats = stats.get(viewer.id);
 
   return (
-    <>
-      <PageHeader eyebrow="Account" title="Profile" />
+    <div className="max-w-2xl">
+      <PageHeader title="Profile" />
 
-      <div className="grid gap-8 lg:grid-cols-[20rem_1fr]">
-        <aside className="space-y-4">
-          <Card className="p-6 text-center">
-            <Avatar name={profile.full_name} seed={viewer.id} size="xl" className="mx-auto" />
-            <p className="mt-4 text-lg font-semibold text-ink">{profile.full_name}</p>
-            <div className="mt-2 flex justify-center">
-              <Badge tone="accent">{isTailor ? "Tailor account" : "Customer account"}</Badge>
-            </div>
-            {isTailor ? (
-              <div className="mt-3 flex justify-center">
-                <RatingSummary avg={myStats?.avg_rating ?? null} count={myStats?.review_count ?? 0} />
-              </div>
-            ) : null}
-            <p className="mt-4 text-xs text-muted">Member since {formatDate(profile.created_at, { day: undefined })}</p>
-            {isTailor ? (
-              <Link href={`/tailors/${viewer.id}`} className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-ink hover:text-accent">
-                View public profile <ExternalLink className="size-3.5" aria-hidden />
-              </Link>
-            ) : null}
-          </Card>
-
-          <div className="grid grid-cols-2 gap-3">
-            {isTailor ? (
-              <>
-                <StatTile label="Offers sent" value={offers.length} href="/offers" />
-                <StatTile label="Completed orders" value={completed} href="/orders?tab=completed" />
-              </>
-            ) : (
-              <>
-                <StatTile label="Requests" value={requests.length} href="/requests?tab=all" />
-                <StatTile label="Completed orders" value={completed} href="/orders?tab=completed" />
-              </>
-            )}
+      <div className="mb-8 flex items-center gap-4">
+        <Avatar name={profile.full_name} seed={viewer.id} size="lg" />
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-lg font-semibold text-ink">{profile.full_name}</p>
+          <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
+            <span>{isTailor ? "Tailor" : "Customer"} · since {formatDate(profile.created_at, { day: undefined })}</span>
+            {isTailor ? <RatingSummary avg={myStats?.avg_rating ?? null} count={myStats?.review_count ?? 0} className="text-sm" /> : null}
           </div>
-        </aside>
+        </div>
+        {isTailor ? (
+          <Link href={`/tailors/${viewer.id}`} className="hidden shrink-0 items-center gap-1.5 text-sm font-medium text-muted hover:text-ink sm:inline-flex">
+            Public profile <ExternalLink className="size-3.5" aria-hidden />
+          </Link>
+        ) : null}
+      </div>
 
         <div className="space-y-6">
           <Card className="p-6 sm:p-8">
-            <h2 className="text-lg font-semibold text-ink">{isTailor ? "Your tailor profile" : "Your details"}</h2>
-            <p className="mt-1 mb-6 text-sm text-muted">
-              {isTailor
-                ? "This is what customers see alongside your offers."
-                : "Tailors see your name on orders and your city on your requests."}
-            </p>
+            <h2 className="mb-6 text-[0.95rem] font-semibold text-ink">{isTailor ? "Tailor profile" : "Your details"}</h2>
             <ProfileForm profile={profile} />
           </Card>
 
           <Card className="p-6 sm:p-8">
-            <h2 className="text-lg font-semibold text-ink">Account</h2>
+            <h2 className="text-[0.95rem] font-semibold text-ink">Account</h2>
             <dl className="mt-5 space-y-4 text-sm">
               <div className="flex flex-wrap justify-between gap-2">
                 <dt className="text-muted">Email</dt>
@@ -92,11 +59,7 @@ export default async function ProfilePage() {
                 <dd className="font-medium text-ink capitalize">{profile.role}</dd>
               </div>
             </dl>
-            <p className="mt-5 flex items-start gap-2 rounded-2xl bg-ivory p-4 text-xs leading-relaxed text-muted">
-              <ShieldCheck className="mt-0.5 size-4 shrink-0 text-success" aria-hidden />
-              Your account type was chosen when you signed up and can’t be changed. To use MyTailor in the other role,
-              create a separate account.
-            </p>
+            <p className="mt-4 text-xs text-muted">Account type is set at sign-up and can’t be changed.</p>
             <div className="mt-6 flex flex-wrap gap-3 border-t border-line pt-6">
               <Link href="/reset-password" className="inline-flex h-11 items-center rounded-full border border-line px-5 text-sm font-semibold text-ink hover:border-stone">
                 Change password
@@ -109,7 +72,6 @@ export default async function ProfilePage() {
             </div>
           </Card>
         </div>
-      </div>
-    </>
+    </div>
   );
 }

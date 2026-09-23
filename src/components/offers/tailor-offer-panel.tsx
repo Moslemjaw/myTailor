@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowRight, History, Lock, PartyPopper, Pencil } from "lucide-react";
+import { ArrowRight, History, Lock, Pencil } from "lucide-react";
 import { OfferStatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -33,12 +33,9 @@ export function TailorOfferPanel({
   if (myOffer?.status === "accepted" && order) {
     return (
       <Card className="overflow-hidden">
-        <div className="bg-ink p-6 text-ivory">
-          <PartyPopper className="size-6 text-accent-soft" aria-hidden />
-          <p className="mt-4 text-xl font-semibold">You were selected</p>
-          <p className="mt-1 text-sm text-ivory/70">
-            The customer accepted your offer. This is now order {orderRef(order.order_number)}.
-          </p>
+        <div className="bg-ink px-6 py-5 text-ivory">
+          <p className="font-semibold">You were selected</p>
+          <p className="mt-0.5 text-sm text-ivory/70">This is now order {orderRef(order.order_number)}.</p>
         </div>
         <div className="p-6">
           <OfferSummary offer={myOffer} />
@@ -64,8 +61,7 @@ export function TailorOfferPanel({
     }
     return (
       <Card className="p-5 sm:p-6">
-        <h2 className="font-display text-3xl text-ink">Submit an offer</h2>
-        <p className="mt-1 mb-6 text-sm text-muted">Your price, how long you need, and a note on your approach.</p>
+        <h2 className="mb-5 text-lg font-semibold text-ink">Make an offer</h2>
         <OfferForm requestId={requestId} existing={null} daysLeft={daysLeft} />
       </Card>
     );
@@ -76,7 +72,7 @@ export function TailorOfferPanel({
     <Card className="p-5 sm:p-6">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="font-display text-3xl text-ink">Your offer</h2>
+          <h2 className="text-lg font-semibold text-ink">Your offer</h2>
           <p className="mt-1 text-xs text-muted">
             {myOffer.revision > 1 ? `Revision ${myOffer.revision} · updated ${timeAgo(myOffer.updated_at)}` : `Sent ${timeAgo(myOffer.created_at)}`}
           </p>
@@ -86,12 +82,12 @@ export function TailorOfferPanel({
 
       {myOffer.status === "declined" && open ? (
         <Notice tone="warning" className="mt-5" title="The customer declined this offer">
-          You can revise it while the request remains open — a revised offer goes back to the customer.
+          Revise it to send it back.
         </Notice>
       ) : null}
       {myOffer.status === "closed" || !open ? (
         <Notice tone="locked" className="mt-5" title="Offer frozen">
-          The customer chose another tailor, so this offer can no longer be changed. Thank you for taking part.
+          The customer chose another tailor.
         </Notice>
       ) : null}
 
@@ -124,9 +120,6 @@ export function TailorOfferPanel({
               <Lock className="size-4" aria-hidden /> Editing is closed for this request.
             </p>
           )}
-          {open && myOffer.status === "pending" ? (
-            <p className="mt-3 text-center text-xs text-muted">Waiting for the customer to decide. You can still revise it.</p>
-          ) : null}
         </>
       )}
 
@@ -165,14 +158,14 @@ export function TailorOfferPanel({
 function OfferSummary({ offer }: { offer: Offer }) {
   return (
     <>
-      <div className="grid grid-cols-2 gap-3 rounded-2xl bg-ivory p-4">
+      <div className="grid grid-cols-2 gap-3 rounded-xl bg-ivory p-4">
         <div>
           <p className="text-xs font-medium text-muted">Price</p>
-          <p className="mt-1 font-display text-3xl leading-none text-ink">{formatPrice(offer.price)}</p>
+          <p className="mt-1 text-xl font-semibold tracking-tight text-ink">{formatPrice(offer.price)}</p>
         </div>
         <div>
           <p className="text-xs font-medium text-muted">Turnaround</p>
-          <p className="mt-1 font-display text-3xl leading-none text-ink">{formatDays(offer.turnaround_days)}</p>
+          <p className="mt-1 text-xl font-semibold tracking-tight text-ink">{formatDays(offer.turnaround_days)}</p>
         </div>
       </div>
       <p className="mt-4 text-sm leading-relaxed whitespace-pre-line text-ink/85">“{offer.message}”</p>

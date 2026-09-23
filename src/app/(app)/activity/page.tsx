@@ -28,20 +28,14 @@ function group(items: Notification[]) {
 }
 
 export default async function ActivityPage() {
-  const viewer = await requireViewer();
+  await requireViewer();
   const items = await getNotifications(80);
   const unread = items.filter((n) => !n.read_at).map((n) => n.id);
 
   return (
     <>
       <PageHeader
-        eyebrow="Activity"
-        title="Updates"
-        description={
-          viewer.profile.role === "customer"
-            ? "New offers, order progress and reminders — only what matters."
-            : "Decisions on your offers and changes to your orders."
-        }
+        title="Activity"
       />
       <MarkSeen ids={unread} />
       {items.length === 0 ? (
@@ -54,10 +48,10 @@ export default async function ActivityPage() {
         <div className="max-w-3xl space-y-8">
           {group(items).map((g) => (
             <section key={g.label} aria-labelledby={`g-${g.label}`}>
-              <h2 id={`g-${g.label}`} className="eyebrow mb-3">
+              <h2 id={`g-${g.label}`} className="mb-3 text-sm font-medium text-muted">
                 {g.label}
               </h2>
-              <div className="divide-y divide-line overflow-hidden rounded-[var(--radius-card)] border border-line bg-paper shadow-soft">
+              <div className="divide-y divide-line overflow-hidden rounded-[var(--radius-card)] border border-line bg-paper">
                 {g.items.map((n) => (
                   <ActivityItem key={n.id} n={n} />
                 ))}

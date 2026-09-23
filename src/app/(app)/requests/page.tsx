@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { FileText, Plus } from "lucide-react";
 import { CustomerRequestCard } from "@/components/requests/request-cards";
 import { ButtonLink } from "@/components/ui/button";
-import { PageHeader } from "@/components/ui/card";
+import { PageHeader, RowList } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/feedback";
 import { LinkTabs } from "@/components/ui/nav-bits";
 import { requireRole } from "@/lib/auth";
@@ -25,12 +25,10 @@ export default async function RequestsPage({ searchParams }: PageProps<"/request
   return (
     <>
       <PageHeader
-        eyebrow="Customer"
         title="My requests"
-        description="Everything you’ve asked tailors to make, and where each request stands."
         actions={
           <ButtonLink href="/requests/new" icon={<Plus className="size-4" />}>
-            Create request
+            New request
           </ButtonLink>
         }
       />
@@ -39,7 +37,7 @@ export default async function RequestsPage({ searchParams }: PageProps<"/request
         <EmptyState
           icon={<FileText />}
           title="You haven’t created any requests yet."
-          description="Describe the garment you want, add a reference photo, and tailors will send you offers."
+          description="Describe what you’d like made and tailors will send you offers."
           action={<ButtonLink href="/requests/new" icon={<Plus className="size-4" />}>Create your first request</ButtonLink>}
         />
       ) : (
@@ -54,11 +52,11 @@ export default async function RequestsPage({ searchParams }: PageProps<"/request
             ]}
           />
           {shown.length ? (
-            <div className="grid gap-3 lg:grid-cols-2">
+            <RowList>
               {shown.map((r) => (
                 <CustomerRequestCard key={r.id} request={r} imageUrl={r.image_path ? images.get(r.image_path) : null} />
               ))}
-            </div>
+            </RowList>
           ) : (
             <EmptyState
               compact

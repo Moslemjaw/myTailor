@@ -47,7 +47,7 @@ export function ReviewForm({ orderId, tailorName }: { orderId: string; tailorNam
         <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-success-soft text-success">
           <CircleCheck className="size-6" aria-hidden />
         </span>
-        <h2 className="mt-5 font-display text-4xl text-ink">Thank you</h2>
+        <h2 className="mt-5 text-2xl font-semibold text-ink">Thank you</h2>
         <p className="mt-2 text-muted">Your review for {tailorName} has been published.</p>
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
           <Link href={`/orders/${orderId}`} className="inline-flex h-11 items-center justify-center rounded-full bg-ink px-5 text-sm font-semibold text-ivory hover:bg-charcoal">

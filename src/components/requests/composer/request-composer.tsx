@@ -209,7 +209,7 @@ export function RequestComposer({
                   aria-current={current ? "step" : undefined}
                   className={cn(
                     "flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition",
-                    current ? "bg-paper shadow-soft ring-1 ring-line" : "hover:bg-cream/60 disabled:hover:bg-transparent",
+                    current ? "bg-paper ring-1 ring-line" : "hover:bg-paper/60 disabled:hover:bg-transparent",
                   )}
                 >
                   <span
@@ -241,7 +241,7 @@ export function RequestComposer({
 
         <div key={step} className="animate-fade-up">
           {step === "basics" ? (
-            <StepShell headingRef={headingRef} title="What would you like made?" lead="A clear title helps the right tailors find your request.">
+            <StepShell headingRef={headingRef} title="What would you like made?" lead="A short title and the type of garment.">
               <Field id="title" label="Request title" hint="For example: “Navy three-piece suit for a wedding”." error={errors.title}>
                 <Input
                   value={values.title}
@@ -292,17 +292,15 @@ export function RequestComposer({
             <StepShell
               headingRef={headingRef}
               title="Add a reference image"
-              lead="Optional, but it helps tailors understand the style you have in mind — and lets our assistant suggest a description."
+              lead="Optional. Helps tailors see the style — and lets AI suggest a description."
             >
               <ImageUploader userId={userId} value={values.image} onChange={(img) => set("image", img)} />
-              <p className="mt-4 text-xs leading-relaxed text-muted">
-                Your image is private. It’s visible to you and to tailors viewing your request while it’s open.
-              </p>
+              <p className="mt-3 text-xs text-muted">Private — only visible to tailors viewing your request.</p>
             </StepShell>
           ) : null}
 
           {step === "description" ? (
-            <StepShell headingRef={headingRef} title="Describe what you want" lead="Fit, fabric, colour, occasion, details you love — in your own words.">
+            <StepShell headingRef={headingRef} title="Describe what you want" lead="Fit, fabric, colour, occasion — in your own words.">
               <div className="grid gap-6 xl:grid-cols-[1fr_22rem]">
                 <Field
                   id="description"
@@ -340,7 +338,7 @@ export function RequestComposer({
           ) : null}
 
           {step === "timing" ? (
-            <StepShell headingRef={headingRef} title="When do you need it?" lead="Tailors will tell you how many days they need. Give yourself time for a fitting.">
+            <StepShell headingRef={headingRef} title="When do you need it?" lead="Leave a little time for a fitting.">
               <div className="flex flex-wrap gap-2" role="group" aria-label="Quick choices">
                 {[
                   ["In 2 weeks", 14],
@@ -386,9 +384,9 @@ export function RequestComposer({
             <StepShell
               headingRef={headingRef}
               title={mode === "create" ? "Review your request" : "Edit your request"}
-              lead={mode === "create" ? "This is what tailors will see. You can edit it while it’s open." : "Update any section, then save your changes."}
+              lead={mode === "create" ? "This is what tailors will see." : "Update any section, then save."}
             >
-              <div className="overflow-hidden rounded-3xl border border-line bg-paper shadow-soft">
+              <div className="overflow-hidden rounded-[var(--radius-card)] border border-line bg-paper">
                 {values.image ? (
                   <div className="border-b border-line bg-cream">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -466,10 +464,10 @@ function StepShell({
 }) {
   return (
     <section>
-      <h2 ref={headingRef} tabIndex={-1} className="font-display text-4xl leading-tight text-ink outline-none md:text-[2.75rem]">
+      <h2 ref={headingRef} tabIndex={-1} className="text-2xl font-semibold tracking-[-0.02em] text-ink outline-none">
         {title}
       </h2>
-      <p className="mt-2 mb-8 max-w-2xl leading-relaxed text-muted">{lead}</p>
+      <p className="mt-1.5 mb-8 max-w-xl text-muted">{lead}</p>
       {children}
     </section>
   );

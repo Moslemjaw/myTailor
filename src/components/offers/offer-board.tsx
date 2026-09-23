@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowUpDown, CalendarCheck, CalendarX, Check, CircleCheck, Lock, MessageSquare, Package, Clock } from "lucide-react";
+import { ArrowUpDown, CalendarCheck, CalendarX, CircleCheck, Lock, MessageSquare, Package, Clock } from "lucide-react";
 import { acceptOffer, declineOffer } from "@/actions/offers";
 import { Avatar } from "@/components/ui/avatar";
-import { Badge, OfferStatusBadge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { EmptyState, Notice } from "@/components/ui/feedback";
@@ -95,48 +95,49 @@ export function OfferBoard({
     });
   }
 
+  const heading = (
+    <div className="mb-3 flex items-center justify-between gap-3">
+      <h2 id="offers-title" className="text-[0.95rem] font-semibold text-ink">
+        Offers {offers.length ? <span className="font-normal text-muted">· {offers.length}</span> : null}
+      </h2>
+      {open && active.length > 1 ? (
+        <label className="inline-flex items-center gap-1.5 text-sm text-muted">
+          <ArrowUpDown className="size-3.5" aria-hidden />
+          <span className="sr-only">Sort offers by</span>
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as Sort)}
+            className="cursor-pointer bg-transparent py-1 text-sm font-medium text-ink focus:outline-none"
+          >
+            <option value="recommended">Recommended</option>
+            <option value="price">Lowest price</option>
+            <option value="speed">Fastest</option>
+          </select>
+        </label>
+      ) : null}
+    </div>
+  );
+
   if (offers.length === 0) {
     return (
+      <>
+      {heading}
       <EmptyState
+        compact
         icon={<Clock />}
         title="No offers yet. Tailors will appear here when they respond."
-        description="Most requests receive their first offer within a day. We’ll notify you as soon as one arrives."
+        description="We’ll notify you as soon as a tailor responds."
       />
+      </>
     );
   }
 
   return (
     <div>
+      {heading}
       {open ? (
         <>
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-muted">
-              {active.length ? (
-                <>
-                  <strong className="font-semibold text-ink">{plural(active.length, "offer")}</strong> ready to compare
-                </>
-              ) : (
-                "No offers are waiting for a decision."
-              )}
-            </p>
-            {active.length > 1 ? (
-              <label className="inline-flex items-center gap-2 text-sm text-muted">
-                <ArrowUpDown className="size-4" aria-hidden />
-                <span className="sr-only sm:not-sr-only">Sort by</span>
-                <select
-                  value={sort}
-                  onChange={(e) => setSort(e.target.value as Sort)}
-                  className="rounded-full border border-line bg-paper py-1.5 pr-3 pl-3 text-sm font-semibold text-ink focus:border-ink focus:outline-none"
-                >
-                  <option value="recommended">Recommended</option>
-                  <option value="price">Lowest price</option>
-                  <option value="speed">Fastest</option>
-                </select>
-              </label>
-            ) : null}
-          </div>
-
-          <div className="grid gap-4 xl:grid-cols-2">
+          <div className="grid gap-3">
             {sorted.map((o) => (
               <OfferCard
                 key={o.id}
@@ -170,7 +171,7 @@ export function OfferBoard({
                 </span>
               </summary>
               <p className="mt-2 text-sm text-muted">These tailors can still revise their offer while your request is open. Revised offers return to the list above.</p>
-              <div className="mt-4 grid gap-4 opacity-80 xl:grid-cols-2">
+              <div className="mt-4 grid gap-3 opacity-75">
                 {declined.map((o) => (
                   <OfferCard key={o.id} offer={o} stats={stats[o.tailor_id]} daysLeft={daysLeft} />
                 ))}
@@ -183,7 +184,7 @@ export function OfferBoard({
           <Notice tone="locked" className="mb-5" title="Offers are closed">
             You chose a tailor, so this request no longer accepts or changes offers.
           </Notice>
-          <div className="grid gap-4 xl:grid-cols-2">
+          <div className="grid gap-3">
             {[...settled, ...declined]
               .sort((a, b) => Number(b.status === "accepted") - Number(a.status === "accepted"))
               .map((o) => (
@@ -295,86 +296,57 @@ function OfferCard({
   readyBy.setDate(readyBy.getDate() + offer.turnaround_days);
   const fits = offer.turnaround_days <= daysLeft;
   const accepted = offer.status === "accepted";
+  const live = offer.status === "pending" || offer.status === "declined";
+  const tags = badges.filter(Boolean) as string[];
 
   return (
     <article
       className={cn(
-        "flex flex-col rounded-[var(--radius-card)] border bg-paper p-5 shadow-soft transition sm:p-6",
-        accepted ? "border-ink ring-1 ring-ink" : "border-line",
+        "rounded-[var(--radius-card)] border bg-paper p-5 sm:p-6",
+        accepted ? "border-ink" : "border-line",
       )}
       aria-label={`Offer from ${t?.full_name ?? "a tailor"}`}
     >
       <div className="flex items-start gap-3">
         <Avatar name={t?.full_name} seed={offer.tailor_id} />
         <div className="min-w-0 flex-1">
-          <Link href={`/tailors/${offer.tailor_id}`} className="block truncate font-semibold text-ink hover:underline">
-            {t?.full_name ?? "Tailor"}
-          </Link>
-          <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
-            <RatingSummary avg={stats?.avg_rating ?? null} count={stats?.review_count ?? 0} className="text-xs" />
-            {t?.city ? <span>· {t.city}</span> : null}
-            {t?.years_experience ? <span>· {plural(t.years_experience, "yr")} experience</span> : null}
+          <div className="flex flex-wrap items-center gap-x-2">
+            <Link href={`/tailors/${offer.tailor_id}`} className="truncate font-semibold text-ink hover:underline">
+              {t?.full_name ?? "Tailor"}
+            </Link>
+            {accepted ? <Badge tone="success">Chosen</Badge> : offer.status === "closed" ? <Badge>Not selected</Badge> : offer.status === "declined" ? <Badge tone="danger">Declined</Badge> : null}
           </div>
+          <RatingSummary avg={stats?.avg_rating ?? null} count={stats?.review_count ?? 0} className="mt-0.5 text-xs" />
         </div>
-        {offer.status !== "pending" ? (
-          accepted ? <Badge tone="success" dot>Chosen</Badge> : offer.status === "closed" ? <Badge>Not selected</Badge> : <OfferStatusBadge status={offer.status} />
-        ) : null}
-      </div>
-
-      <div className="mt-5 grid grid-cols-2 gap-3 rounded-2xl bg-ivory p-4">
-        <div>
-          <p className="text-xs font-medium text-muted">Price</p>
-          <p className="mt-1 font-display text-3xl leading-none text-ink">{formatPrice(offer.price)}</p>
-        </div>
-        <div>
-          <p className="text-xs font-medium text-muted">Turnaround</p>
-          <p className="mt-1 font-display text-3xl leading-none text-ink">{formatDays(offer.turnaround_days)}</p>
+        <div className="text-right">
+          <p className="text-xl font-semibold tracking-tight text-ink tabular-nums">{formatPrice(offer.price)}</p>
+          <p className="text-sm text-muted">{formatDays(offer.turnaround_days)}</p>
         </div>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        {badges.filter(Boolean).map((b) => (
-          <Badge key={b} tone="accent">
-            {b}
-          </Badge>
-        ))}
-        {offer.status === "pending" || offer.status === "declined" ? (
+      <p className="mt-4 text-[0.95rem] leading-relaxed text-ink/85">{offer.message}</p>
+
+      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[0.8rem]">
+        {live ? (
           fits ? (
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-success">
-              <CalendarCheck className="size-3.5" aria-hidden /> Ready around {formatDate(readyBy, { year: undefined })} — before your date
+            <span className="inline-flex items-center gap-1 text-success">
+              <CalendarCheck className="size-3.5" aria-hidden /> Ready by {formatDate(readyBy, { year: undefined })}
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-warning">
-              <CalendarX className="size-3.5" aria-hidden /> May finish after your date
+            <span className="inline-flex items-center gap-1 text-warning">
+              <CalendarX className="size-3.5" aria-hidden /> After your date
             </span>
           )
         ) : null}
+        {tags.map((b) => (
+          <span key={b} className="font-medium text-accent">
+            {b}
+          </span>
+        ))}
+        {offer.revision > 1 ? <span className="text-muted">Revised {timeAgo(offer.updated_at)}</span> : null}
       </div>
 
-      <blockquote className="mt-4 flex-1 text-[0.92rem] leading-relaxed text-ink/85">“{offer.message}”</blockquote>
-
-      {t?.specialties?.length ? (
-        <ul className="mt-4 flex flex-wrap gap-1.5" aria-label="Specialties">
-          {t.specialties.slice(0, 4).map((s) => (
-            <li key={s} className="rounded-full bg-cream px-2.5 py-1 text-[0.7rem] font-medium text-muted">
-              {s}
-            </li>
-          ))}
-        </ul>
-      ) : null}
-
-      <p className="mt-4 text-xs text-muted">
-        {offer.revision > 1 ? (
-          <>
-            <Check className="mr-1 inline size-3" aria-hidden />
-            Revised {timeAgo(offer.updated_at)}
-          </>
-        ) : (
-          <>Sent {timeAgo(offer.created_at)}</>
-        )}
-      </p>
-
-      {actions ? <div className="mt-5 flex flex-wrap gap-2 border-t border-line pt-5">{actions}</div> : null}
+      {actions ? <div className="mt-5 flex flex-wrap gap-2">{actions}</div> : null}
     </article>
   );
 }

@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronRight, ClipboardList, Compass } from "lucide-react";
-import { RequestImage } from "@/components/requests/request-image";
-import { Badge, OfferStatusBadge } from "@/components/ui/badge";
+import { OfferStatusBadge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
-import { PageHeader } from "@/components/ui/card";
+import { PageHeader, RowList } from "@/components/ui/card";
+import { GarmentThumb } from "@/components/ui/garment-icon";
 import { EmptyState } from "@/components/ui/feedback";
 import { LinkTabs } from "@/components/ui/nav-bits";
 import { requireRole } from "@/lib/auth";
-import { garmentLabel } from "@/lib/constants";
 import { formatDays, formatPrice, orderRef, timeAgo } from "@/lib/format";
 import { signImagePaths } from "@/lib/images";
 import { getMyOffers, type MyOfferRow } from "@/lib/queries";
@@ -30,9 +29,7 @@ export default async function MyOffersPage({ searchParams }: PageProps<"/offers"
   return (
     <>
       <PageHeader
-        eyebrow="Tailor"
         title="My offers"
-        description="Every offer you’ve made, and where it stands with the customer."
         actions={<ButtonLink href="/browse" variant="secondary" icon={<Compass className="size-4" />}>Browse requests</ButtonLink>}
       />
 
@@ -55,13 +52,13 @@ export default async function MyOffersPage({ searchParams }: PageProps<"/offers"
             ]}
           />
           {shown.length ? (
-            <ul className="grid gap-3">
+            <RowList>
               {shown.map((o) => (
                 <li key={o.id}>
                   <OfferRow offer={o} imageUrl={o.request?.image_path ? images.get(o.request.image_path) : null} />
                 </li>
               ))}
-            </ul>
+            </RowList>
           ) : (
             <EmptyState
               compact
@@ -86,27 +83,26 @@ function OfferRow({ offer, imageUrl }: { offer: MyOfferRow; imageUrl?: string | 
   return (
     <Link
       href={href}
-      className="group flex gap-4 rounded-[var(--radius-card)] border border-line bg-paper p-4 shadow-soft transition hover:border-stone hover:shadow-lift sm:p-5"
+      className="group flex items-center gap-4 px-4 py-4 transition-colors hover:bg-ivory sm:px-5"
     >
-      <RequestImage url={imageUrl} alt="" className="size-16 shrink-0 rounded-xl sm:size-20" />
+      <GarmentThumb type={offer.request?.garment_type ?? ""} imageUrl={imageUrl} />
       <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <OfferStatusBadge status={offer.status} />
-          {offer.revision > 1 ? <Badge>Revision {offer.revision}</Badge> : null}
-        </div>
-        <p className="mt-1.5 truncate font-semibold text-ink">{offer.request?.title ?? "Request"}</p>
-        <p className="mt-0.5 text-sm text-muted">
-          {garmentLabel(offer.request?.garment_type ?? "")} · {formatPrice(offer.price)} · {formatDays(offer.turnaround_days)}
-        </p>
-        <p className="mt-2 text-xs text-muted">
-          {offer.order
-            ? `Order ${orderRef(offer.order.order_number)} — open order`
-            : offer.status === "declined" && offer.request?.status === "open"
-              ? "Declined — you can revise it"
-              : `Updated ${timeAgo(offer.updated_at)}`}
+        <p className="truncate font-medium text-ink">{offer.request?.title ?? "Request"}</p>
+        <p className="mt-0.5 truncate text-sm text-muted">
+          {formatPrice(offer.price)} · {formatDays(offer.turnaround_days)}
+          {offer.revision > 1 ? ` · revision ${offer.revision}` : ""}
+          <span className="hidden sm:inline">
+            {" · "}
+            {offer.order
+              ? `Order ${orderRef(offer.order.order_number)}`
+              : offer.status === "declined" && offer.request?.status === "open"
+                ? "You can revise it"
+                : `updated ${timeAgo(offer.updated_at)}`}
+          </span>
         </p>
       </div>
-      <ChevronRight className="hidden size-5 self-center text-stone transition group-hover:translate-x-0.5 group-hover:text-ink sm:block" aria-hidden />
+      <OfferStatusBadge status={offer.status} />
+      <ChevronRight className="size-4 shrink-0 text-stone transition group-hover:translate-x-0.5 group-hover:text-ink" aria-hidden />
     </Link>
   );
 }

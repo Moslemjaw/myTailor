@@ -20,9 +20,8 @@ export default async function MessagesPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Messages"
-        title="Order conversations"
-        description="Each order has its own private chat between you and the other person on that order."
+        title="Messages"
+        description="One private conversation per order."
       />
 
       {conversations.length === 0 ? (
@@ -31,8 +30,8 @@ export default async function MessagesPage() {
           title="Chat is available after an offer is accepted."
           description={
             role === "customer"
-              ? "Choose a tailor on one of your requests and a private conversation for that order opens here."
-              : "When a customer accepts your offer, a private conversation for that order opens here."
+              ? "Choose a tailor on one of your requests to start chatting."
+              : "When a customer accepts your offer, you can chat here."
           }
           action={
             role === "customer" ? (
@@ -43,13 +42,13 @@ export default async function MessagesPage() {
           }
         />
       ) : (
-        <ul className="divide-y divide-line overflow-hidden rounded-[var(--radius-card)] border border-line bg-paper shadow-soft">
+        <ul className="divide-y divide-line overflow-hidden rounded-[var(--radius-card)] border border-line bg-paper">
           {conversations.map((c) => {
             const other = role === "customer" ? c.tailor : c.customer;
             const mine = c.last?.sender_id === viewer.id;
             return (
               <li key={c.id}>
-                <Link href={`/messages/${c.id}`} className="flex items-center gap-4 p-4 transition hover:bg-cream/40 sm:p-5">
+                <Link href={`/messages/${c.id}`} className="flex items-center gap-4 px-4 py-4 transition-colors hover:bg-ivory sm:px-5">
                   <Avatar name={other?.full_name} seed={other?.id} />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-3">

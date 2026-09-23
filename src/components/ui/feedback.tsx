@@ -20,18 +20,18 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center rounded-[var(--radius-card)] border border-dashed border-sand bg-paper/60 text-center",
-        compact ? "px-6 py-8" : "px-6 py-14 md:py-16",
+        "flex flex-col items-center rounded-[var(--radius-card)] text-center",
+        compact ? "border border-line px-6 py-8" : "px-6 py-16 md:py-24",
         className,
       )}
     >
       {icon ? (
-        <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-cream text-muted [&_svg]:size-5">
+        <div className="mb-5 flex size-11 items-center justify-center rounded-xl bg-cream text-charcoal [&_svg]:size-5 [&_svg]:stroke-[1.5]">
           {icon}
         </div>
       ) : null}
       <p className={cn("font-semibold text-ink", compact ? "text-[0.95rem]" : "text-lg")}>{title}</p>
-      {description ? <p className="mt-2 max-w-md text-sm leading-relaxed text-muted">{description}</p> : null}
+      {description ? <p className="mt-1.5 max-w-sm text-sm leading-relaxed text-muted">{description}</p> : null}
       {action ? <div className="mt-6">{action}</div> : null}
     </div>
   );

@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Compass, EyeOff } from "lucide-react";
 import { FeedRequestCard } from "@/components/requests/request-cards";
-import { PageHeader } from "@/components/ui/card";
+import { PageHeader, RowList } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/feedback";
+import { GarmentIcon } from "@/components/ui/garment-icon";
 import { requireRole } from "@/lib/auth";
 import { GARMENT_TYPES } from "@/lib/constants";
 import { cn } from "@/lib/cn";
@@ -19,6 +20,12 @@ function href(current: Search, patch: Search) {
   const qs = new URLSearchParams(Object.entries(next).filter(([, v]) => v) as [string, string][]).toString();
   return `/browse${qs ? `?${qs}` : ""}`;
 }
+
+const SORTS = [
+  { key: "newest", label: "Newest" },
+  { key: "deadline", label: "Soonest date" },
+  { key: "fewest", label: "Fewest offers" },
+];
 
 export default async function BrowsePage({ searchParams }: PageProps<"/browse">) {
   await requireRole("tailor");
@@ -39,77 +46,58 @@ export default async function BrowsePage({ searchParams }: PageProps<"/browse">)
   return (
     <>
       <PageHeader
-        eyebrow="Marketplace"
         title="Browse requests"
-        description="Open requests from customers looking for a tailor. Find one that suits your skills and send an offer."
+        description={
+          <span className="inline-flex items-center gap-1.5">
+            <EyeOff className="size-3.5" aria-hidden /> Offers are blind — no one sees another tailor’s price.
+          </span>
+        }
       />
 
-      <div className="mb-6 flex items-start gap-3 rounded-2xl border border-line bg-paper p-4 text-sm text-muted">
-        <EyeOff className="mt-0.5 size-4 shrink-0 text-accent" aria-hidden />
-        <p>
-          <strong className="font-semibold text-ink">Offers are blind.</strong> You’ll see how many offers a request has —
-          never another tailor’s price, timing or message. They can’t see yours either.
-        </p>
+      {/* Garment filter */}
+      <div className="-mx-4 mb-4 overflow-x-auto px-4 scrollbar-none sm:mx-0 sm:px-0">
+        <ul className="flex w-max gap-2" aria-label="Garment type">
+          <Chip href={href(current, { type: undefined })} active={!type}>
+            All
+          </Chip>
+          {GARMENT_TYPES.map((g) => (
+            <Chip key={g.value} href={href(current, { type: g.value })} active={type === g.value} icon={<GarmentIcon type={g.value} className="size-4" />}>
+              {g.label}
+            </Chip>
+          ))}
+        </ul>
       </div>
 
-      {/* Filters */}
-      <div className="mb-8 space-y-4">
-        <div className="-mx-4 overflow-x-auto px-4 scrollbar-none sm:mx-0 sm:px-0">
-          <ul className="flex w-max gap-2" aria-label="Garment type">
-            <Chip href={href(current, { type: undefined })} active={!type}>
-              All garments
-            </Chip>
-            {GARMENT_TYPES.map((g) => (
-              <Chip key={g.value} href={href(current, { type: g.value })} active={type === g.value}>
-                {g.label}
-              </Chip>
-            ))}
-          </ul>
+      {/* View + sort */}
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-sm">
+        <div className="flex gap-4" role="group" aria-label="Show">
+          <TextLink href={href(current, { show: undefined })} active={show === "new"}>
+            Not offered yet
+          </TextLink>
+          <TextLink href={href(current, { show: "all" })} active={show === "all"}>
+            All open
+          </TextLink>
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
-          <div className="flex gap-1 rounded-full border border-line bg-paper p-1" role="group" aria-label="Show">
-            <Seg href={href(current, { show: undefined })} active={show === "new"}>
-              Not yet offered
-            </Seg>
-            <Seg href={href(current, { show: "all" })} active={show === "all"}>
-              All open
-            </Seg>
-          </div>
-          <div className="flex items-center gap-2 text-muted">
-            <span>Sort:</span>
-            <Seg href={href(current, { sort: undefined })} active={sort === "newest"} plain>
-              Newest
-            </Seg>
-            <Seg href={href(current, { sort: "deadline" })} active={sort === "deadline"} plain>
-              Soonest date
-            </Seg>
-            <Seg href={href(current, { sort: "fewest" })} active={sort === "fewest"} plain>
-              Fewest offers
-            </Seg>
-          </div>
+        <div className="flex items-center gap-4 text-muted" role="group" aria-label="Sort">
+          {SORTS.map((s) => (
+            <TextLink key={s.key} href={href(current, { sort: s.key === "newest" ? undefined : s.key })} active={sort === s.key}>
+              {s.label}
+            </TextLink>
+          ))}
         </div>
       </div>
 
       {list.length ? (
-        <>
-          <p className="mb-4 text-sm text-muted" role="status">
-            {list.length} {list.length === 1 ? "request" : "requests"}
-          </p>
-          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-            {list.map((r) => (
-              <FeedRequestCard key={r.id} request={r} imageUrl={r.image_path ? images.get(r.image_path) : null} />
-            ))}
-          </div>
-        </>
+        <RowList label={`${list.length} requests`}>
+          {list.map((r) => (
+            <FeedRequestCard key={r.id} request={r} imageUrl={r.image_path ? images.get(r.image_path) : null} />
+          ))}
+        </RowList>
       ) : (
         <EmptyState
           icon={<Compass />}
           title="No requests are currently available."
-          description={
-            feed.length && (type || show === "new")
-              ? "Nothing matches these filters. Try another garment type or show all open requests."
-              : "New customer requests appear here as soon as they’re posted. Check back soon."
-          }
+          description={feed.length && (type || show === "new") ? "Nothing matches these filters." : "New requests appear here as soon as they’re posted."}
           action={
             type || show === "new" ? (
               <Link href="/browse?show=all" className="text-sm font-semibold text-ink underline underline-offset-4">
@@ -123,7 +111,7 @@ export default async function BrowsePage({ searchParams }: PageProps<"/browse">)
   );
 }
 
-function Chip({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
+function Chip({ href, active, icon, children }: { href: string; active: boolean; icon?: React.ReactNode; children: React.ReactNode }) {
   return (
     <li>
       <Link
@@ -131,32 +119,24 @@ function Chip({ href, active, children }: { href: string; active: boolean; child
         scroll={false}
         aria-current={active ? "true" : undefined}
         className={cn(
-          "inline-flex h-9 items-center rounded-full border px-4 text-sm font-medium whitespace-nowrap transition",
+          "inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-sm whitespace-nowrap transition",
           active ? "border-ink bg-ink text-ivory" : "border-line bg-paper text-ink hover:border-stone",
         )}
       >
+        {icon}
         {children}
       </Link>
     </li>
   );
 }
 
-function Seg({ href, active, children, plain }: { href: string; active: boolean; children: React.ReactNode; plain?: boolean }) {
+function TextLink({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
   return (
     <Link
       href={href}
       scroll={false}
       aria-current={active ? "true" : undefined}
-      className={cn(
-        "rounded-full px-3 py-1.5 font-semibold whitespace-nowrap transition",
-        plain
-          ? active
-            ? "text-ink underline decoration-accent decoration-2 underline-offset-4"
-            : "text-muted hover:text-ink"
-          : active
-            ? "bg-ink text-ivory"
-            : "text-muted hover:text-ink",
-      )}
+      className={cn("whitespace-nowrap transition", active ? "font-semibold text-ink" : "text-muted hover:text-ink")}
     >
       {children}
     </Link>

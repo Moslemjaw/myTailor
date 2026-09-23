@@ -14,7 +14,7 @@
   --color-paper: #fffdf9;
   --color-cream: #f3ede3;
   --color-sand: #e7decf;
-  --color-line: #e3dace;
+  --color-line: #e9e2d7;
   --color-stone: #a39a8e;
   --color-muted: #6b6358;
   --color-charcoal: #2e2a26;
@@ -33,10 +33,10 @@
   --color-info: #3e5a73;
   --color-info-soft: #e4ebf1;
 
-  --shadow-soft: 0 1px 2px rgb(29 27 24 / 0.04), 0 8px 24px -12px rgb(29 27 24 / 0.12);
-  --shadow-lift: 0 2px 4px rgb(29 27 24 / 0.05), 0 18px 40px -18px rgb(29 27 24 / 0.22);
+  --shadow-soft: 0 1px 2px rgb(29 27 24 / 0.04);
+  --shadow-lift: 0 1px 2px rgb(29 27 24 / 0.04), 0 12px 32px -16px rgb(29 27 24 / 0.18);
 
-  --radius-card: 1.125rem;
+  --radius-card: 1rem;
 
   --animate-fade-up: fade-up 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   --animate-shimmer: shimmer 1.6s linear infinite;

@@ -98,7 +98,7 @@ export function ImageUploader({
   if (value && !busy) {
     return (
       <div>
-        <div className="relative overflow-hidden rounded-3xl border border-line bg-cream">
+        <div className="relative overflow-hidden rounded-[var(--radius-card)] border border-line bg-cream">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={value.previewUrl} alt="Your reference image" className="mx-auto max-h-[26rem] w-full object-contain" />
         </div>
@@ -132,7 +132,7 @@ export function ImageUploader({
           void handleFile(e.dataTransfer.files?.[0]);
         }}
         className={cn(
-          "flex min-h-64 cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-dashed px-6 py-10 text-center transition",
+          "flex min-h-64 cursor-pointer flex-col items-center justify-center rounded-[var(--radius-card)] border border-dashed px-6 py-10 text-center transition",
           "has-[:focus-visible]:ring-2",
           dragging ? "border-accent bg-accent-soft/60" : "border-sand bg-paper hover:border-stone hover:bg-white",
           busy && "pointer-events-none",
@@ -145,12 +145,11 @@ export function ImageUploader({
             <p className="mt-4 font-semibold text-ink" role="status">
               {status === "processing" ? "Preparing your image…" : "Uploading…"}
             </p>
-            <p className="mt-1 text-sm text-muted">This only takes a moment.</p>
-          </>
+                      </>
         ) : (
           <>
-            <span className="flex size-14 items-center justify-center rounded-full bg-cream text-accent">
-              <ImagePlus className="size-6" aria-hidden />
+            <span className="flex size-12 items-center justify-center rounded-xl bg-cream text-charcoal">
+              <ImagePlus className="size-5" strokeWidth={1.5} aria-hidden />
             </span>
             <p className="mt-5 font-semibold text-ink">
               <span className="hidden md:inline">Drag a photo here, or </span>
@@ -159,9 +158,7 @@ export function ImageUploader({
                 <span className="hidden md:inline">browse your files</span>
               </span>
             </p>
-            <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted">
-              A screenshot, a magazine page or a garment you love. JPG, PNG or WebP.
-            </p>
+            <p className="mt-1.5 text-sm text-muted">JPG, PNG or WebP</p>
             <span className="mt-5 inline-flex items-center gap-1.5 text-xs text-muted md:hidden">
               <Camera className="size-3.5" aria-hidden /> Camera or photo library
             </span>

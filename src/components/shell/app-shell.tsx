@@ -68,35 +68,13 @@ export function AppShell({
   const mobileItems = MOBILE[role].map((h) => items.find((i) => i.href === h)!);
 
   return (
-    <div className="min-h-dvh lg:grid lg:grid-cols-[17rem_1fr]">
+    <div className="min-h-dvh lg:grid lg:grid-cols-[15rem_1fr]">
       <LiveNotifications userId={userId} />
 
       {/* Desktop sidebar */}
-      <aside className="sticky top-0 hidden h-dvh flex-col border-r border-line bg-paper/70 px-5 py-6 lg:flex">
+      <aside className="sticky top-0 hidden h-dvh flex-col border-r border-line px-4 py-6 lg:flex">
         <Logo href="/dashboard" className="px-2" />
-        <p className="mt-6 px-2 text-[0.7rem] font-semibold tracking-[0.16em] text-muted uppercase">
-          {role === "customer" ? "Customer" : "Tailor"} account
-        </p>
-
-        <div className="mt-4 px-1">
-          {role === "customer" ? (
-            <Link
-              href="/requests/new"
-              className="flex h-11 items-center justify-center gap-2 rounded-full bg-ink text-sm font-semibold text-ivory transition hover:bg-charcoal"
-            >
-              <Plus className="size-4" aria-hidden /> New request
-            </Link>
-          ) : (
-            <Link
-              href="/browse"
-              className="flex h-11 items-center justify-center gap-2 rounded-full bg-ink text-sm font-semibold text-ivory transition hover:bg-charcoal"
-            >
-              <Compass className="size-4" aria-hidden /> Find requests
-            </Link>
-          )}
-        </div>
-
-        <nav aria-label="Main" className="mt-6 flex-1">
+        <nav aria-label="Main" className="mt-10 flex-1">
           <ul className="space-y-1">
             {items.map((item) => {
               const active = isActive(item.href);
@@ -108,10 +86,10 @@ export function AppShell({
                     aria-current={active ? "page" : undefined}
                     className={cn(
                       "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition [&_svg]:size-[1.1rem]",
-                      active ? "bg-cream text-ink" : "text-muted hover:bg-cream/60 hover:text-ink",
+                      active ? "bg-paper font-semibold text-ink shadow-soft ring-1 ring-line" : "text-muted hover:text-ink",
                     )}
                   >
-                    <span className={active ? "text-accent" : undefined}>{item.icon}</span>
+                    <span className={active ? "text-ink" : undefined}>{item.icon}</span>
                     <span className="flex-1">{item.label}</span>
                     {count > 0 ? (
                       <span className="min-w-5 rounded-full bg-accent px-1.5 py-0.5 text-center text-[0.68rem] font-bold text-white">
@@ -126,11 +104,11 @@ export function AppShell({
           </ul>
         </nav>
 
-        <div className="flex items-center gap-3 rounded-2xl border border-line bg-paper p-3">
+        <div className="flex items-center gap-3 border-t border-line px-2 pt-4">
           <Avatar name={name} seed={userId} size="sm" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold text-ink">{name}</p>
-            <p className="text-xs text-muted capitalize">{role}</p>
+            <p className="text-xs text-muted">{role === "customer" ? "Customer" : "Tailor"}</p>
           </div>
           <form action={signOut}>
             <button
@@ -170,7 +148,7 @@ export function AppShell({
           </div>
         </header>
 
-        <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-4 pt-6 pb-28 sm:px-6 md:px-10 md:pt-10 lg:pb-16">
+        <main id="main" className="mx-auto w-full max-w-5xl flex-1 px-4 pt-6 pb-28 sm:px-6 md:px-10 md:pt-12 lg:pb-16">
           {children}
         </main>
 
@@ -193,7 +171,7 @@ export function AppShell({
                       active ? "text-ink" : "text-muted",
                     )}
                   >
-                    <span className={cn("rounded-full px-4 py-1 transition", active && "bg-cream text-accent")}>{item.icon}</span>
+                    <span className={cn("rounded-full px-4 py-1 transition", active && "bg-cream")}>{item.icon}</span>
                     {item.short ?? item.label}
                     {count > 0 ? (
                       <span className="absolute top-1.5 left-1/2 ml-2.5 size-2 rounded-full bg-accent" aria-hidden />

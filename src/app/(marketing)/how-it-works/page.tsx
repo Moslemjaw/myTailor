@@ -1,142 +1,90 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button";
-import { JourneyStrip } from "@/components/marketing/journey-strip";
-import { OfferPreview } from "@/components/marketing/offer-preview";
-import { BRAND_IMAGES } from "@/lib/brand-images";
 
 export const metadata: Metadata = {
   title: "How it works",
   description: "How MyTailor connects customers who need custom clothing with skilled independent tailors.",
 };
 
-const CUSTOMER_STEPS = [
-  ["Create your request", "Give it a title, choose the type of garment and add a reference photo if you have one."],
-  ["Get a head start from AI", "Our assistant can turn your photo into a suggested description. Edit it, accept it or write your own."],
-  ["Set your date", "Tell tailors when you need it. They’ll only offer if they can make it work."],
-  ["Receive offers", "Tailors reply with a price, a turnaround and a note about how they’d make it."],
-  ["Choose one tailor", "Compare offers and reviews, then choose. The request closes and becomes your order."],
-  ["Talk privately", "A chat opens for that order only. Share measurements, fabric choices and fitting times."],
-  ["Follow progress", "See each stage — accepted, in progress, ready, completed — as your tailor updates it."],
-  ["Leave a review", "Once it’s complete, tell others what it was like to work with your tailor."],
+const CUSTOMER = [
+  ["Create a request", "Title, garment type, a reference photo and your date."],
+  ["Compare offers", "Price, turnaround, a note and reviews from each tailor."],
+  ["Choose one tailor", "Your request closes and becomes a private order."],
+  ["Chat and follow progress", "Accepted → In progress → Ready → Completed."],
+  ["Leave a review", "Once it’s done, tell others how it went."],
 ];
 
-const TAILOR_STEPS = [
-  ["Create your tailor profile", "Add your specialties and experience so customers know what you do best."],
-  ["Browse open requests", "Every request shows the brief, reference photo, desired date and how many offers it has."],
-  ["Send your offer", "Set your price, how many days you need, and a short note on your approach."],
-  ["Revise while it’s open", "Change your mind? Update your offer until the customer decides. Every version is kept."],
-  ["Get selected", "When a customer chooses you, the request becomes an order and your private chat opens."],
-  ["Work through the stages", "Start work, mark it ready, then complete it — one clear step at a time."],
+const TAILOR = [
+  ["Set up your profile", "Specialties and experience appear with every offer."],
+  ["Browse open requests", "Clear briefs, photos and dates."],
+  ["Send an offer", "Your price, timing and approach. Revise it while it’s open."],
+  ["Get selected", "The order and a private chat open."],
+  ["Deliver", "Move the order forward one stage at a time."],
+];
+
+const FAQ = [
+  ["Can tailors see each other’s offers?", "No. A tailor only sees their own offer and how many offers a request has."],
+  ["When can I talk to a tailor?", "As soon as you accept their offer. The chat belongs to that order only."],
+  ["Does the AI write my request?", "It only suggests. You edit, use or ignore it."],
+  ["How do payments work?", "You settle the agreed price directly with your tailor."],
 ];
 
 export default function HowItWorksPage() {
   return (
     <>
-      <section className="mx-auto max-w-7xl px-5 pt-14 pb-16 md:px-8 md:pt-20">
-        <p className="eyebrow">How it works</p>
-        <h1 className="mt-5 max-w-4xl font-display text-5xl leading-[1.02] text-ink md:text-7xl">
-          Customers post what they need. Tailors make offers. Customers choose.
-        </h1>
-        <p className="mt-7 max-w-2xl text-lg leading-relaxed text-muted">
-          MyTailor isn’t a clothing store and it isn’t a general freelance site. It’s built around one thing: getting a
-          garment made by the right person, with everything in one place.
-        </p>
+      <section className="mx-auto max-w-6xl px-5 pt-16 pb-16 md:px-8 md:pt-24">
+        <h1 className="max-w-3xl font-display text-5xl leading-[1.05] text-ink md:text-6xl">How MyTailor works</h1>
+        <p className="mt-5 max-w-lg text-lg text-muted">Customers post what they need. Tailors make offers. Customers choose.</p>
       </section>
 
-      <section className="border-y border-line bg-paper">
-        <div className="mx-auto max-w-7xl px-5 py-16 md:px-8">
-          <JourneyStrip />
+      <section className="border-t border-line">
+        <div className="mx-auto grid max-w-6xl gap-16 px-5 py-20 md:grid-cols-2 md:px-8">
+          <Journey id="customers" title="For customers" steps={CUSTOMER} href="/signup?role=customer" cta="Create a request" />
+          <Journey id="tailors" title="For tailors" steps={TAILOR} href="/signup?role=tailor" cta="Join as a tailor" />
         </div>
       </section>
 
-      <section id="customers" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-20 md:px-8 md:py-28">
-        <div className="grid gap-14 lg:grid-cols-[1fr_1.1fr] lg:gap-20">
-          <div className="lg:sticky lg:top-28 lg:self-start">
-            <p className="eyebrow">The customer journey</p>
-            <h2 className="mt-4 font-display text-4xl leading-tight text-ink md:text-5xl">
-              From “I know what I want” to “it fits perfectly.”
-            </h2>
-            <OfferPreview className="mt-10 max-w-sm" />
-          </div>
-          <ol className="space-y-2">
-            {CUSTOMER_STEPS.map(([title, text], i) => (
-              <Step key={title} n={i + 1} title={title}>
-                {text}
-              </Step>
+      <section className="border-t border-line">
+        <div className="mx-auto max-w-3xl px-5 py-20 md:px-8">
+          <h2 className="text-xl font-semibold text-ink">Questions</h2>
+          <div className="mt-6 divide-y divide-line border-y border-line">
+            {FAQ.map(([q, a]) => (
+              <details key={q} className="group py-5">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-6 font-medium text-ink">
+                  {q}
+                  <span className="text-xl font-light text-muted transition group-open:rotate-45" aria-hidden>
+                    +
+                  </span>
+                </summary>
+                <p className="mt-2 text-muted">{a}</p>
+              </details>
             ))}
-            <li className="pt-6">
-              <ButtonLink href="/signup?role=customer" icon={<ArrowRight className="order-last size-4" />}>
-                Create a request
-              </ButtonLink>
-            </li>
-          </ol>
-        </div>
-      </section>
-
-      <section id="tailors" className="scroll-mt-24 border-t border-line bg-cream/50">
-        <div className="mx-auto grid max-w-7xl gap-14 px-5 py-20 md:px-8 md:py-28 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
-          <ol className="order-2 space-y-2 lg:order-1">
-            {TAILOR_STEPS.map(([title, text], i) => (
-              <Step key={title} n={i + 1} title={title}>
-                {text}
-              </Step>
-            ))}
-            <li className="pt-6">
-              <ButtonLink href="/signup?role=tailor" icon={<ArrowRight className="order-last size-4" />}>
-                Join as a tailor
-              </ButtonLink>
-            </li>
-          </ol>
-          <div className="order-1 lg:sticky lg:top-28 lg:order-2 lg:self-start">
-            <p className="eyebrow">The tailor journey</p>
-            <h2 className="mt-4 font-display text-4xl leading-tight text-ink md:text-5xl">
-              Find the work. Make the offer. Do what you do best.
-            </h2>
-            <div className="relative mt-10 aspect-[4/3] overflow-hidden rounded-3xl bg-cream">
-              <Image src={BRAND_IMAGES.patternMaking.src} alt={BRAND_IMAGES.patternMaking.alt} fill sizes="(min-width:1024px) 40vw, 100vw" className="object-cover" />
-            </div>
           </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-4xl px-5 py-20 md:px-8 md:py-28">
-        <p className="eyebrow text-center">Good to know</p>
-        <h2 className="mt-4 text-center font-display text-4xl text-ink">Questions people ask</h2>
-        <div className="mt-12 divide-y divide-line border-y border-line">
-          {[
-            ["Can tailors see each other’s offers?", "No. Offers are blind. A tailor sees their own offer and how many offers a request has — never another tailor’s price, timing or message."],
-            ["Can I change my offer?", "Yes, as long as the request is still open. Once the customer chooses a tailor, every offer on that request is frozen."],
-            ["When can I talk to a tailor?", "Private chat opens as soon as you accept an offer. It belongs to that order and only the two of you can read it."],
-            ["Does the AI write my request for me?", "It only suggests. You decide what goes in your request — edit the suggestion, keep it, or ignore it completely."],
-            ["How do payments work?", "You agree the price on MyTailor and settle it directly with your tailor. Online payments aren’t part of MyTailor yet."],
-            ["Who can leave a review?", "Only the customer of an order, only after it’s marked completed, and only once."],
-          ].map(([q, a]) => (
-            <details key={q} className="group py-6">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-lg font-semibold text-ink">
-                {q}
-                <span className="text-2xl font-light text-muted transition group-open:rotate-45" aria-hidden>
-                  +
-                </span>
-              </summary>
-              <p className="mt-3 max-w-2xl leading-relaxed text-muted">{a}</p>
-            </details>
-          ))}
         </div>
       </section>
     </>
   );
 }
 
-function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
+function Journey({ id, title, steps, href, cta }: { id: string; title: string; steps: string[][]; href: string; cta: string }) {
   return (
-    <li className="flex gap-6 border-b border-line py-7 last:border-0">
-      <span className="font-display text-3xl leading-none text-stone">{String(n).padStart(2, "0")}</span>
-      <div>
-        <p className="text-lg font-semibold text-ink">{title}</p>
-        <p className="mt-2 leading-relaxed text-muted">{children}</p>
-      </div>
-    </li>
+    <div id={id} className="scroll-mt-24">
+      <h2 className="text-xl font-semibold text-ink">{title}</h2>
+      <ol className="mt-8 space-y-6">
+        {steps.map(([t, d], i) => (
+          <li key={t} className="flex gap-4">
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-full border border-line text-xs font-semibold text-muted">{i + 1}</span>
+            <div>
+              <p className="font-medium text-ink">{t}</p>
+              <p className="mt-0.5 text-sm text-muted">{d}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <ButtonLink href={href} variant="secondary" className="mt-10" icon={<ArrowRight className="order-last size-4" />}>
+        {cta}
+      </ButtonLink>
+    </div>
   );
 }

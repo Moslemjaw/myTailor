@@ -1,97 +1,78 @@
 import Link from "next/link";
-import { CalendarDays, ChevronRight, MapPin, Users } from "lucide-react";
-import { Badge, OfferStatusBadge, RequestStatusBadge } from "@/components/ui/badge";
+import { ChevronRight, Users } from "lucide-react";
+import { Badge, OfferStatusBadge } from "@/components/ui/badge";
+import { GarmentThumb } from "@/components/ui/garment-icon";
 import { garmentLabel } from "@/lib/constants";
 import { cn } from "@/lib/cn";
-import { describeDeadline, orderRef, plural, timeAgo } from "@/lib/format";
+import { formatDateShort, orderRef, plural, timeAgo } from "@/lib/format";
 import type { CustomerRequestRow } from "@/lib/queries";
 import type { FeedRequest } from "@/lib/types";
-import { RequestImage } from "./request-image";
 
-/** Customer's own request — what's happening with it at a glance. */
+const row = "group flex items-center gap-4 px-4 py-4 transition-colors hover:bg-ivory sm:px-5";
+
+/** Customer's own request — one line of status, one obvious signal. */
 export function CustomerRequestCard({ request, imageUrl }: { request: CustomerRequestRow; imageUrl?: string | null }) {
-  const total = request.offers.length;
   const pending = request.offers.filter((o) => o.status === "pending").length;
+  const total = request.offers.length;
 
-  let summary: React.ReactNode;
-  if (request.order) {
-    summary = <span className="text-ink">Order {orderRef(request.order.order_number)} created</span>;
-  } else if (request.status === "closed") {
-    summary = "Closed";
-  } else if (pending > 0) {
-    summary = <span className="font-semibold text-accent">{plural(pending, "offer")} waiting for you</span>;
-  } else if (total > 0) {
-    summary = `${plural(total, "offer")} reviewed`;
-  } else {
-    summary = "Waiting for offers";
-  }
+  let status: React.ReactNode;
+  if (request.order) status = <Badge tone="success">Order {orderRef(request.order.order_number)}</Badge>;
+  else if (request.status === "closed") status = <Badge>Closed</Badge>;
+  else if (pending > 0) status = <Badge tone="accent" dot>{plural(pending, "new offer")}</Badge>;
+  else status = <span className="text-sm text-muted">{total ? plural(total, "offer") : "Awaiting offers"}</span>;
 
   return (
-    <Link
-      href={request.order ? `/orders/${request.order.id}` : `/requests/${request.id}`}
-      className="group flex gap-4 rounded-[var(--radius-card)] border border-line bg-paper p-4 shadow-soft transition hover:border-stone hover:shadow-lift sm:p-5"
-    >
-      <RequestImage url={imageUrl} alt="" className="size-20 shrink-0 rounded-xl sm:size-24" />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <div className="flex flex-wrap items-center gap-2">
-          <RequestStatusBadge status={request.status} />
-          {pending > 0 && request.status === "open" ? <Badge tone="accent">New offers</Badge> : null}
+    <li>
+      <Link href={request.order ? `/orders/${request.order.id}` : `/requests/${request.id}`} className={row}>
+        <GarmentThumb type={request.garment_type} imageUrl={imageUrl} />
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-medium text-ink">{request.title}</p>
+          <p className="mt-0.5 truncate text-sm text-muted">
+            {garmentLabel(request.garment_type)} · by {formatDateShort(request.desired_date)}
+          </p>
         </div>
-        <p className="mt-2 truncate font-semibold text-ink">{request.title}</p>
-        <p className="mt-0.5 text-sm text-muted">
-          {garmentLabel(request.garment_type)} · needed {describeDeadline(request.desired_date).toLowerCase()}
-        </p>
-        <p className="mt-auto pt-2 text-sm text-muted">{summary}</p>
-      </div>
-      <ChevronRight className="hidden size-5 self-center text-stone transition group-hover:translate-x-0.5 group-hover:text-ink sm:block" aria-hidden />
-    </Link>
+        <div className="hidden shrink-0 sm:block">{status}</div>
+        <ChevronRight className="size-4 shrink-0 text-stone transition group-hover:translate-x-0.5 group-hover:text-ink" aria-hidden />
+      </Link>
+      <div className="-mt-2 pb-3 pl-[4.75rem] sm:hidden">{status}</div>
+    </li>
   );
 }
 
-/** Marketplace card for tailors — aggregate competition only. */
+/** Marketplace row for tailors — aggregate competition only, never offer contents. */
 export function FeedRequestCard({ request, imageUrl }: { request: FeedRequest; imageUrl?: string | null }) {
   return (
-    <Link
-      href={`/browse/${request.id}`}
-      className="group flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-paper shadow-soft transition hover:-translate-y-0.5 hover:border-stone hover:shadow-lift"
-    >
-      <RequestImage url={imageUrl} alt={`Reference image for ${request.title}`} className="aspect-[4/3] w-full" iconClassName="size-8" />
-      <div className="flex flex-1 flex-col p-5">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-xs font-semibold tracking-wide text-accent uppercase">{garmentLabel(request.garment_type)}</span>
-          <span className="text-xs text-muted">{timeAgo(request.created_at)}</span>
-        </div>
-        <p className="mt-2 line-clamp-2 text-[1.05rem] leading-snug font-semibold text-ink">{request.title}</p>
-        <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted">{request.description}</p>
-        <div className="mt-auto space-y-2 pt-5 text-[0.82rem] text-muted">
-          <p className="flex items-center gap-2">
-            <CalendarDays className="size-4 text-stone" aria-hidden /> Needed {describeDeadline(request.desired_date).toLowerCase()}
+    <li>
+      <Link href={`/browse/${request.id}`} className={cn(row, "items-start sm:items-center")}>
+        <GarmentThumb type={request.garment_type} imageUrl={imageUrl} size="lg" alt="" />
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-medium text-ink">{request.title}</p>
+          <p className="mt-0.5 line-clamp-1 text-sm text-muted">{request.description}</p>
+          <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.8rem] text-muted">
+            <span>{garmentLabel(request.garment_type)}</span>
+            <span aria-hidden>·</span>
+            <span>Needed {formatDateShort(request.desired_date)}</span>
+            <span aria-hidden>·</span>
+            <CompetitionLabel count={request.offer_count} />
+            <span className="hidden sm:inline" aria-hidden>·</span>
+            <span className="hidden sm:inline">{timeAgo(request.created_at)}</span>
           </p>
-          {request.customer_city ? (
-            <p className="flex items-center gap-2">
-              <MapPin className="size-4 text-stone" aria-hidden /> {request.customer_city}
-            </p>
-          ) : null}
         </div>
-        <div className="mt-4 flex items-center justify-between border-t border-line pt-4">
-          <CompetitionLabel count={request.offer_count} />
-          {request.my_offer_status ? (
-            <OfferStatusBadge status={request.my_offer_status} />
-          ) : (
-            <span className="text-sm font-semibold text-ink group-hover:text-accent">View request</span>
-          )}
+        <div className="hidden shrink-0 sm:block">
+          {request.my_offer_status ? <OfferStatusBadge status={request.my_offer_status} /> : null}
         </div>
-      </div>
-    </Link>
+        <ChevronRight className="mt-1 size-4 shrink-0 text-stone transition group-hover:translate-x-0.5 group-hover:text-ink sm:mt-0" aria-hidden />
+      </Link>
+    </li>
   );
 }
 
 /** The only competition signal tailors receive: a count. */
 export function CompetitionLabel({ count, className }: { count: number; className?: string }) {
-  const label = count === 0 ? "No offers yet — be the first" : count < 3 ? plural(count, "offer") : `${count} offers — popular`;
+  const label = count === 0 ? "No offers yet" : count === 1 ? "1 offer" : `${count} offers`;
   return (
-    <span className={cn("inline-flex items-center gap-1.5 text-[0.82rem] text-muted", className)}>
-      <Users className="size-4 text-stone" aria-hidden />
+    <span className={cn("inline-flex items-center gap-1", className)}>
+      <Users className="size-3.5" aria-hidden />
       {label}
     </span>
   );

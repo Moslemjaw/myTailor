@@ -99,7 +99,7 @@ export function OfferForm({
       <Field
         id="offer-message"
         label="Message to the customer"
-        hint="Your approach, fabric suggestions, fittings included — what makes your offer the right one."
+        hint="Your approach, fabric, fittings included."
         error={errors.message}
       >
         <Textarea
@@ -117,13 +117,11 @@ export function OfferForm({
             Cancel
           </Button>
         ) : null}
-        <Button type="submit" size="lg" loading={pending} loadingText={existing ? "Updating…" : "Sending…"} disabled={Boolean(unchanged)}>
+        <Button type="submit" size="lg" className={onCancel ? undefined : "w-full"} loading={pending} loadingText={existing ? "Updating…" : "Sending…"} disabled={Boolean(unchanged)}>
           {existing ? "Update offer" : "Send offer"}
         </Button>
       </div>
-      <p className="text-xs leading-relaxed text-muted">
-        Only this customer will see your offer. You can revise it while the request is open — every version is kept.
-      </p>
+      <p className="text-xs leading-relaxed text-muted">Only the customer sees your offer. You can revise it while the request is open.</p>
     </form>
   );
 }
