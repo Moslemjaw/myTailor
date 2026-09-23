@@ -5,6 +5,7 @@ import { ChevronRight, MessageSquare, Star } from "lucide-react";
 import { ChatPanel } from "@/components/chat/chat-panel";
 import { OrderProgress } from "@/components/orders/order-progress";
 import { StatusAdvancer } from "@/components/orders/status-advancer";
+import { MeasurementSummary } from "@/components/requests/measurement-summary";
 import { Avatar } from "@/components/ui/avatar";
 import { OrderStatusBadge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
@@ -28,7 +29,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/or
   // RLS returns nothing for non-participants: indistinguishable from "doesn't exist".
   if (!detail) notFound();
 
-  const { order, request, offerMessage, review } = detail;
+  const { order, request, offerMessage, review, measurements } = detail;
   const role = viewer.id === order.customer_id ? "customer" : "tailor";
   const counterpart = role === "customer" ? order.tailor : order.customer;
   const counterpartName = counterpart?.full_name ?? (role === "customer" ? "your tailor" : "your customer");
@@ -156,6 +157,15 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/or
                 </div>
               </div>
             ) : null}
+
+            <div className="mt-5 border-t border-line pt-5">
+              <p className="mb-3 text-[0.8rem] text-muted">Size &amp; measurements</p>
+              <MeasurementSummary
+                size={request?.size ?? null}
+                measurements={measurements}
+                note={role === "customer" ? "Shared with your tailor only" : "Private — only you and the customer can see these"}
+              />
+            </div>
 
             {offerMessage ? (
               <div className="mt-5 border-t border-line pt-5">

@@ -47,6 +47,7 @@ The UI shapes what people normally do; Postgres decides what they are allowed to
 - **Orders and chat:** readable and writable by the two participants only. `sender_id` is forced to `auth.uid()`.
 - **Order state machine:** `accepted → in_progress → ready → completed`, tailor only, one step at a time.
 - **Reviews:** customer of the order, status `completed`, once (unique + RPC check).
+- **Measurements:** stored in `request_measurements`, readable only by the request owner and — after acceptance — the tailor on that order. Browsing tailors see only the size and a `has_measurements` flag. They are frozen once the request closes and validated in the database (known keys, 1–300 cm).
 - **Role:** set once from sign-up metadata and never updatable.
 - **AI key:** used only in `src/lib/ai.ts` (`import "server-only"`). Images are read with the customer's own session, so Storage RLS applies.
 

@@ -16,7 +16,7 @@ export default async function EditRequestPage({ params }: PageProps<"/requests/[
   const viewer = await requireRole("customer");
   const detail = await getCustomerRequestDetail(id, viewer.id);
   if (!detail) notFound();
-  const { request, offers } = detail;
+  const { request, offers, measurements } = detail;
 
   if (request.status !== "open") {
     return (
@@ -54,6 +54,8 @@ export default async function EditRequestPage({ params }: PageProps<"/requests/[
           desired_date: request.desired_date,
           image: request.image_path && previewUrl ? { path: request.image_path, previewUrl } : null,
           ai_assisted: request.ai_assisted,
+          size: request.size ?? "",
+          measurements: Object.fromEntries(Object.entries(measurements ?? {}).map(([k, v]) => [k, String(v)])),
         }}
       />
     </>

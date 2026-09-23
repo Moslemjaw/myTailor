@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronRight, Users } from "lucide-react";
+import { ChevronRight, Ruler, Users } from "lucide-react";
 import { Badge, OfferStatusBadge } from "@/components/ui/badge";
 import { GarmentThumb } from "@/components/ui/garment-icon";
 import { garmentLabel } from "@/lib/constants";
@@ -49,9 +49,20 @@ export function FeedRequestCard({ request, imageUrl }: { request: FeedRequest; i
           <p className="truncate font-medium text-ink">{request.title}</p>
           <p className="mt-0.5 line-clamp-1 text-sm text-muted">{request.description}</p>
           <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.8rem] text-muted">
-            <span>{garmentLabel(request.garment_type)}</span>
+            <span>
+              {garmentLabel(request.garment_type)}
+              {request.size ? ` · ${request.size}` : ""}
+            </span>
             <span aria-hidden>·</span>
             <span>Needed {formatDateShort(request.desired_date)}</span>
+            {request.has_measurements ? (
+              <>
+                <span aria-hidden>·</span>
+                <span className="inline-flex items-center gap-1">
+                  <Ruler className="size-3.5" aria-hidden /> Measured
+                </span>
+              </>
+            ) : null}
             <span aria-hidden>·</span>
             <CompetitionLabel count={request.offer_count} />
             <span className="hidden sm:inline" aria-hidden>·</span>

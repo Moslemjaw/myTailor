@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { EyeOff } from "lucide-react";
+import { EyeOff, Lock, Ruler } from "lucide-react";
 import { TailorOfferPanel } from "@/components/offers/tailor-offer-panel";
 import { CompetitionLabel } from "@/components/requests/request-cards";
 import { RequestImage } from "@/components/requests/request-image";
@@ -64,6 +64,23 @@ export default async function TailorRequestPage({ params }: PageProps<"/browse/[
           ) : null}
 
           <p className="mt-8 max-w-2xl text-[1.02rem] leading-relaxed whitespace-pre-line text-ink/90">{request.description}</p>
+
+          {request.size || request.has_measurements ? (
+            <div className="mt-8 flex max-w-2xl flex-wrap items-center gap-3">
+              {request.size ? (
+                <span className="inline-flex items-center gap-2 rounded-xl border border-line bg-paper px-4 py-2.5 text-sm">
+                  <Ruler className="size-4 text-muted" aria-hidden />
+                  Size <strong className="font-semibold text-ink">{request.size}</strong>
+                </span>
+              ) : null}
+              {request.has_measurements ? (
+                <span className="inline-flex items-center gap-2 rounded-xl border border-line bg-paper px-4 py-2.5 text-sm text-muted">
+                  <Lock className="size-4" aria-hidden />
+                  {order ? "Measurements are in the order" : "Measurements provided — shared if you’re selected"}
+                </span>
+              ) : null}
+            </div>
+          ) : null}
         </article>
 
         <aside className="space-y-3 lg:sticky lg:top-8 lg:self-start">

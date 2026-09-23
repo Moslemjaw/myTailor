@@ -8,16 +8,19 @@ import { Button } from "@/components/ui/button";
 import { Notice } from "@/components/ui/feedback";
 import { Field, Input, Textarea, describedBy } from "@/components/ui/field";
 import { useToast } from "@/components/ui/toast";
-import { GARMENT_TYPES, garmentLabel } from "@/lib/constants";
+import { GARMENT_TYPES, MEASUREMENTS, cleanMeasurements, garmentLabel, measurementsFor, type MeasurementKey } from "@/lib/constants";
+import { GarmentIcon } from "@/components/ui/garment-icon";
 import { cn } from "@/lib/cn";
 import { describeDeadline, formatDate } from "@/lib/format";
 import { AiAssistant } from "./ai-assistant";
 import { ImageUploader, type UploadedImage } from "./image-uploader";
+import { SizeStep } from "./size-step";
 
 const STEPS = [
   { key: "basics", label: "The basics", hint: "Title and garment type" },
   { key: "reference", label: "Reference", hint: "Optional photo" },
   { key: "description", label: "Description", hint: "What you’d like made" },
+  { key: "size", label: "Size", hint: "Optional measurements" },
   { key: "timing", label: "Timing", hint: "When you need it" },
   { key: "review", label: "Review", hint: "Check and post" },
 ] as const;
@@ -31,6 +34,9 @@ export interface ComposerValues {
   desired_date: string;
   image: UploadedImage | null;
   ai_assisted: boolean;
+  size: string;
+  /** Centimetres as typed. Never stored in the local draft. */
+  measurements: Record<string, string>;
 }
 
 const DRAFT_KEY = "mytailor:request-draft";
@@ -58,7 +64,7 @@ export function RequestComposer({
   const toast = useToast();
   const [step, setStep] = useState<StepKey>(mode === "edit" ? "review" : "basics");
   const [values, setValues] = useState<ComposerValues>(
-    initial ?? { title: "", garment_type: "", description: "", desired_date: "", image: null, ai_assisted: false },
+    initial ?? { title: "", garment_type: "", description: "", desired_date: "", image: null, ai_assisted: false, size: "", measurements: {} },
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -75,7 +81,7 @@ export function RequestComposer({
       if (raw) {
         const draft = JSON.parse(raw) as Partial<ComposerValues> & { image?: { path: string } | null };
         // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time hydration from storage
-        setValues((v) => ({ ...v, ...draft, image: null }));
+        setValues((v) => ({ ...v, ...draft, image: null, measurements: {} }));
       }
     } catch {
       /* ignore */
@@ -85,7 +91,8 @@ export function RequestComposer({
   useEffect(() => {
     if (mode !== "create") return;
     try {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify({ ...values, image: null }));
+      // Body measurements are personal — keep them out of browser storage.
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ ...values, image: null, measurements: {} }));
     } catch {
       /* ignore */
     }
@@ -104,6 +111,20 @@ export function RequestComposer({
     });
   }
 
+  function setMeasurement(k: string, value: string) {
+    setValues((v) => ({ ...v, measurements: { ...v.measurements, [k]: value } }));
+    setErrors((e) => {
+      if (!e[`m_${k}`]) return e;
+      const next = { ...e };
+      delete next[`m_${k}`];
+      return next;
+    });
+  }
+
+  /** Only the measurements shown for the chosen garment are kept. */
+  const relevantMeasurements = () =>
+    Object.fromEntries(measurementsFor(values.garment_type).map((k) => [k, values.measurements[k] ?? ""]));
+
   function validate(key: StepKey) {
     const e: Record<string, string> = {};
     if (key === "basics" || key === "review") {
@@ -113,6 +134,9 @@ export function RequestComposer({
     if (key === "description" || key === "review") {
       if (values.description.trim().length < 10) e.description = "Describe what you’d like made (at least 10 characters).";
       if (values.description.length > 4000) e.description = "Please shorten the description (4,000 characters max).";
+    }
+    if (key === "size" || key === "review") {
+      Object.assign(e, cleanMeasurements(relevantMeasurements()).errors);
     }
     if (key === "timing" || key === "review") {
       if (!values.desired_date) e.desired_date = "Choose the date you need it by.";
@@ -144,7 +168,14 @@ export function RequestComposer({
   function submit() {
     const e = validate("review");
     if (Object.keys(e).length) {
-      const first = e.title || e.garment_type ? "basics" : e.description ? "description" : "timing";
+      const first =
+        e.title || e.garment_type
+          ? "basics"
+          : e.description
+            ? "description"
+            : Object.keys(e).some((k) => k.startsWith("m_") || k === "size")
+              ? "size"
+              : "timing";
       goTo(first);
       return;
     }
@@ -157,6 +188,8 @@ export function RequestComposer({
         desired_date: values.desired_date,
         image_path: values.image?.path ?? null,
         ai_assisted: values.ai_assisted,
+        size: values.size || null,
+        measurements: relevantMeasurements(),
       };
       const res = mode === "create" ? await createRequest(payload) : await updateRequest(requestId!, payload);
       if (!res.ok) {
@@ -169,6 +202,9 @@ export function RequestComposer({
           localStorage.removeItem(DRAFT_KEY);
         } catch {
           /* ignore */
+        }
+        if (res.message === "measurements-failed") {
+          toast.error("Your request is live, but the measurements didn’t save. You can add them by editing the request.");
         }
         router.push(`/requests/${res.data!.id}?created=1`);
       } else {
@@ -261,9 +297,9 @@ export function RequestComposer({
                       <label
                         key={g.value}
                         className={cn(
-                          "flex min-h-14 cursor-pointer items-center justify-center rounded-2xl border px-3 text-center text-sm font-medium transition",
-                          "has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent has-[:focus-visible]:ring-offset-2",
-                          selected ? "border-ink bg-ink text-ivory" : "border-line bg-paper text-ink hover:border-stone",
+                          "flex min-h-14 cursor-pointer items-center justify-center gap-2 rounded-xl border px-3 text-center text-sm font-medium transition",
+                          "has-[:focus-visible]:ring-[3px] has-[:focus-visible]:ring-ink/15",
+                          selected ? "border-ink bg-ink text-ivory" : "border-field bg-paper text-ink hover:border-ink",
                         )}
                       >
                         <input
@@ -274,6 +310,7 @@ export function RequestComposer({
                           onChange={() => set("garment_type", g.value)}
                           className="sr-only"
                         />
+                        <GarmentIcon type={g.value} className="size-[1.1rem] shrink-0" />
                         {g.label}
                       </label>
                     );
@@ -337,6 +374,19 @@ export function RequestComposer({
             </StepShell>
           ) : null}
 
+          {step === "size" ? (
+            <StepShell headingRef={headingRef} title="Size and measurements" lead="Both optional — add what you know, or skip.">
+              <SizeStep
+                garment={values.garment_type}
+                size={values.size}
+                measurements={values.measurements}
+                errors={errors}
+                onSize={(sz) => set("size", sz)}
+                onMeasurement={setMeasurement}
+              />
+            </StepShell>
+          ) : null}
+
           {step === "timing" ? (
             <StepShell headingRef={headingRef} title="When do you need it?" lead="Leave a little time for a fitting.">
               <div className="flex flex-wrap gap-2" role="group" aria-label="Quick choices">
@@ -355,7 +405,7 @@ export function RequestComposer({
                       onClick={() => set("desired_date", iso)}
                       className={cn(
                         "rounded-full border px-4 py-2 text-sm font-medium transition",
-                        active ? "border-ink bg-ink text-ivory" : "border-line bg-paper text-ink hover:border-stone",
+                        active ? "border-ink bg-ink text-ivory" : "border-field bg-paper text-ink hover:border-ink",
                       )}
                     >
                       {label}
@@ -411,6 +461,9 @@ export function RequestComposer({
                       </p>
                     ) : null}
                   </ReviewRow>
+                  <ReviewRow label="Size & measurements" onEdit={() => goTo("size")}>
+                    <SizeSummary size={values.size} measurements={relevantMeasurements()} />
+                  </ReviewRow>
                   <ReviewRow label="Needed by" onEdit={() => goTo("timing")} error={errors.desired_date}>
                     {values.desired_date ? formatDate(values.desired_date) : "—"}
                   </ReviewRow>
@@ -441,12 +494,33 @@ export function RequestComposer({
               </Button>
             ) : (
               <Button size="lg" onClick={next} icon={<ArrowRight className="order-last size-4" />}>
-                {step === "reference" && !values.image ? "Skip for now" : step === "timing" ? "Review" : "Continue"}
+                {(step === "reference" && !values.image) ||
+                (step === "size" && !values.size && !Object.values(relevantMeasurements()).some((v) => v.trim()))
+                  ? "Skip for now"
+                  : step === "timing"
+                    ? "Review"
+                    : "Continue"}
               </Button>
             )}
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function SizeSummary({ size, measurements }: { size: string; measurements: Record<string, string> }) {
+  const filled = Object.entries(measurements).filter(([, v]) => v.trim());
+  if (!size && !filled.length) return <span className="text-muted">Not specified — optional</span>;
+  return (
+    <div>
+      <p>{size ? `Size ${size}` : "Size not specified"}</p>
+      {filled.length ? (
+        <p className="mt-1 text-sm text-muted">
+          {filled.map(([k, v]) => `${MEASUREMENTS[k as MeasurementKey]?.label ?? k} ${v} cm`).join(" · ")}
+          <span className="mt-1 block text-xs">Private — shared only with the tailor you choose.</span>
+        </p>
+      ) : null}
     </div>
   );
 }

@@ -23,6 +23,8 @@ export interface TailorRequest {
   desired_date: string;
   image_path: string | null;
   ai_assisted: boolean;
+  size: string | null;
+  has_measurements: boolean;
   status: RequestStatus;
   created_at: string;
   updated_at: string;
@@ -110,7 +112,12 @@ export interface FeedRequest {
   customer_city: string | null;
   offer_count: number;
   my_offer_status: OfferStatus | null;
+  size: string | null;
+  has_measurements: boolean;
 }
+
+/** Centimetres, keyed by MeasurementKey. */
+export type Measurements = Partial<Record<string, number>>;
 
 export interface TailorStats {
   tailor_id: string;

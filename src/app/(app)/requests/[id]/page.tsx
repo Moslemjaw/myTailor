@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, Pencil, Sparkles } from "lucide-react";
 import { OfferBoard } from "@/components/offers/offer-board";
+import { MeasurementSummary } from "@/components/requests/measurement-summary";
 import { RequestImage } from "@/components/requests/request-image";
 import { RequestStatusBadge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
@@ -25,7 +26,7 @@ export default async function RequestDetailPage({ params, searchParams }: PagePr
   // Not the owner, or doesn't exist — same response, nothing leaked.
   if (!detail) notFound();
 
-  const { request, offers, stats, order } = detail;
+  const { request, offers, stats, order, measurements } = detail;
   const imageUrl = await signImagePath(request.image_path);
   const chosen = offers.find((o) => o.status === "accepted");
 
@@ -99,6 +100,13 @@ export default async function RequestDetailPage({ params, searchParams }: PagePr
                   <Sparkles className="size-3.5" aria-hidden /> Started from an AI suggestion
                 </p>
               ) : null}
+              <div className="mt-5 border-t border-line pt-4">
+                <MeasurementSummary
+                  size={request.size}
+                  measurements={measurements}
+                  note={order ? "Shared with your tailor" : "Shared only with the tailor you choose"}
+                />
+              </div>
             </div>
           </Card>
         </aside>

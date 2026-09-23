@@ -2,6 +2,7 @@ import "server-only";
 import { createClient } from "./supabase/server";
 import type {
   FeedRequest,
+  Measurements,
   Message,
   Notification,
   Offer,
@@ -63,7 +64,7 @@ export async function getCustomerRequestDetail(requestId: string, customerId: st
     .maybeSingle<TailorRequest>();
   if (!request) return null;
 
-  const [{ data: offers }, { data: order }] = await Promise.all([
+  const [{ data: offers }, { data: order }, { data: measurementRow }] = await Promise.all([
     supabase
       .from("offers")
       .select(
@@ -72,6 +73,7 @@ export async function getCustomerRequestDetail(requestId: string, customerId: st
       .eq("request_id", requestId)
       .order("created_at", { ascending: true }),
     supabase.from("orders").select("id, order_number, status").eq("request_id", requestId).maybeSingle(),
+    supabase.from("request_measurements").select("data").eq("request_id", requestId).maybeSingle(),
   ]);
 
   const list = ((offers ?? []) as unknown as OfferWithTailor[]).map((o) => ({ ...o, tailor: one(o.tailor) }));
@@ -81,6 +83,7 @@ export async function getCustomerRequestDetail(requestId: string, customerId: st
     offers: list,
     stats,
     order: order as Pick<Order, "id" | "order_number" | "status"> | null,
+    measurements: (measurementRow?.data as Measurements | undefined) ?? null,
   };
 }
 
@@ -97,7 +100,17 @@ export async function getTailorFeed() {
 
 export type TailorRequestView = Pick<
   TailorRequest,
-  "id" | "title" | "description" | "garment_type" | "desired_date" | "image_path" | "status" | "created_at" | "updated_at"
+  | "id"
+  | "title"
+  | "description"
+  | "garment_type"
+  | "desired_date"
+  | "image_path"
+  | "status"
+  | "created_at"
+  | "updated_at"
+  | "size"
+  | "has_measurements"
 > & { customer: { city: string | null } | null };
 
 export async function getTailorRequestDetail(requestId: string, tailorId: string) {
@@ -105,7 +118,7 @@ export async function getTailorRequestDetail(requestId: string, tailorId: string
   const { data: request } = await supabase
     .from("requests")
     .select(
-      "id, title, description, garment_type, desired_date, image_path, status, created_at, updated_at, customer:profiles!requests_customer_id_fkey(city)",
+      "id, title, description, garment_type, desired_date, image_path, status, created_at, updated_at, size, has_measurements, customer:profiles!requests_customer_id_fkey(city)",
     )
     .eq("id", requestId)
     .maybeSingle();
@@ -213,16 +226,18 @@ export async function getOrderDetail(orderId: string) {
   if (!data) return null; // Not a participant, or doesn't exist — same answer.
   const order = normalizeOrder(data);
 
-  const [{ data: request }, { data: offer }, { data: events }, { data: review }] = await Promise.all([
-    supabase.from("requests").select("id, title, description, garment_type, desired_date, image_path, created_at").eq("id", order.request_id).maybeSingle(),
+  const [{ data: request }, { data: offer }, { data: events }, { data: review }, { data: measurementRow }] = await Promise.all([
+    supabase.from("requests").select("id, title, description, garment_type, desired_date, image_path, created_at, size").eq("id", order.request_id).maybeSingle(),
     supabase.from("offers").select("message").eq("id", order.offer_id).maybeSingle(),
     supabase.from("order_events").select("id, from_status, to_status, created_at").eq("order_id", orderId).order("created_at"),
     supabase.from("reviews").select("*").eq("order_id", orderId).maybeSingle<Review>(),
+    supabase.from("request_measurements").select("data").eq("request_id", order.request_id).maybeSingle(),
   ]);
 
   return {
     order,
-    request: request as Pick<TailorRequest, "id" | "title" | "description" | "garment_type" | "desired_date" | "image_path" | "created_at"> | null,
+    request: request as Pick<TailorRequest, "id" | "title" | "description" | "garment_type" | "desired_date" | "image_path" | "created_at" | "size"> | null,
+    measurements: (measurementRow?.data as Measurements | undefined) ?? null,
     offerMessage: (offer?.message as string | undefined) ?? null,
     events: (events ?? []) as OrderEvent[],
     review: review ?? null,
