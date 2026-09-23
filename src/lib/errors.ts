@@ -44,7 +44,9 @@ export function friendlyError(error: ErrLike, fallback = GENERIC): string {
   if (/email not confirmed/i.test(raw)) return "Please confirm your email address first — check your inbox for the link.";
   if (/user already registered|already been registered/i.test(raw)) return "An account with this email already exists. Try signing in instead.";
   if (/password should be at least|weak password/i.test(raw)) return "Please choose a stronger password (at least 8 characters).";
+  if (/email rate limit/i.test(raw)) return "We can’t send sign-up emails right now. Please try again in a little while.";
   if (/rate limit|too many requests/i.test(raw) || error.status === 429) return "Too many attempts. Please wait a moment and try again.";
+  if (/signups? (are |is )?(disabled|not allowed)/i.test(raw)) return "New accounts can’t be created right now. Please try again later.";
   if (/fetch failed|network/i.test(raw)) return "We couldn't reach the server. Check your connection and try again.";
 
   return fallback;
