@@ -23,12 +23,12 @@ export default function LandingPage() {
             <span className="block text-muted">Tailors make offers.</span>
             <span className="block">You choose.</span>
           </h1>
-          <p className="mt-6 max-w-md text-lg text-muted">Custom clothing from skilled tailors — without calling around.</p>
+          <p className="mt-6 max-w-md text-lg text-charcoal/80">Custom clothing from skilled tailors — without calling around.</p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <ButtonLink href="/signup?role=customer" size="lg" icon={<ArrowRight className="order-last size-4" />}>
               Create a request
             </ButtonLink>
-            <ButtonLink href="/signup?role=tailor" size="lg" variant="ghost">
+            <ButtonLink href="/signup?role=tailor" size="lg" variant="secondary">
               I’m a tailor
             </ButtonLink>
           </div>
@@ -41,23 +41,23 @@ export default function LandingPage() {
           </ul>
         </div>
         <div className="relative mx-auto w-full max-w-sm">
-          <div className="absolute -inset-6 -z-10 rounded-[2rem] bg-cream" aria-hidden />
+          <div className="absolute -inset-6 -z-10 rounded-[2rem] border border-line bg-cream" aria-hidden />
           <OfferPreview />
         </div>
       </section>
 
       {/* How it works */}
-      <section className="border-t border-line">
+      <section className="border-y border-line bg-paper">
         <div className="mx-auto max-w-6xl px-5 py-24 md:px-8">
           <h2 className="max-w-md font-display text-4xl leading-tight text-ink">One request. Several offers. Your choice.</h2>
           <ol className="mt-14 grid gap-10 sm:grid-cols-3">
             {STEPS.map((s, i) => (
               <li key={s.title}>
                 <div className="flex items-center gap-3">
-                  <span className="flex size-10 items-center justify-center rounded-xl bg-cream text-charcoal [&_svg]:size-[1.1rem] [&_svg]:stroke-[1.5]">
+                  <span className="flex size-10 items-center justify-center rounded-xl border border-line bg-ivory text-charcoal [&_svg]:size-[1.1rem] [&_svg]:stroke-[1.5]">
                     {s.icon}
                   </span>
-                  <span className="text-sm text-stone tabular-nums">0{i + 1}</span>
+                  <span className="text-sm text-muted tabular-nums">0{i + 1}</span>
                 </div>
                 <p className="mt-5 font-semibold text-ink">{s.title}</p>
                 <p className="mt-1.5 text-muted">{s.text}</p>
@@ -68,7 +68,7 @@ export default function LandingPage() {
       </section>
 
       {/* Two audiences */}
-      <section className="border-t border-line bg-paper">
+      <section>
         <div className="mx-auto grid max-w-6xl gap-4 px-5 py-24 md:grid-cols-2 md:px-8">
           <Audience
             label="For customers"
@@ -89,7 +89,7 @@ export default function LandingPage() {
       </section>
 
       {/* Principles */}
-      <section className="border-t border-line">
+      <section className="border-y border-line bg-paper">
         <div className="mx-auto grid max-w-6xl gap-10 px-5 py-20 sm:grid-cols-3 md:px-8">
           <Principle icon={<EyeOff />} title="Blind offers">Tailors never see each other’s prices.</Principle>
           <Principle icon={<Lock />} title="Private by default">Chat opens only between you and your tailor.</Principle>
@@ -98,12 +98,15 @@ export default function LandingPage() {
       </section>
 
       {/* Closing */}
-      <section className="border-t border-line">
+      <section className="bg-ink text-ivory">
         <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-8 px-5 py-20 md:flex-row md:items-center md:px-8">
-          <h2 className="max-w-lg font-display text-4xl leading-tight text-ink">Your next garment starts with a few sentences.</h2>
-          <ButtonLink href="/signup" size="lg" icon={<ArrowRight className="order-last size-4" />}>
-            Get started
-          </ButtonLink>
+          <h2 className="max-w-lg font-display text-4xl leading-tight">Your next garment starts with a few sentences.</h2>
+          <Link
+            href="/signup"
+            className="inline-flex h-13 shrink-0 items-center gap-2 rounded-full bg-ivory px-7 text-[0.95rem] font-semibold text-ink transition hover:bg-white"
+          >
+            Get started <ArrowRight className="size-4" aria-hidden />
+          </Link>
         </div>
       </section>
     </>
@@ -126,13 +129,13 @@ function Audience({
   dark?: boolean;
 }) {
   return (
-    <div className={dark ? "rounded-[var(--radius-card)] bg-ink p-8 text-ivory md:p-10" : "rounded-[var(--radius-card)] border border-line bg-ivory p-8 md:p-10"}>
-      <p className={dark ? "text-sm text-ivory/60" : "text-sm text-muted"}>{label}</p>
+    <div className={dark ? "rounded-[var(--radius-card)] bg-ink p-8 text-ivory md:p-10" : "rounded-[var(--radius-card)] border border-line bg-paper p-8 md:p-10"}>
+      <p className={dark ? "text-sm text-ivory/70" : "text-sm text-muted"}>{label}</p>
       <h3 className="mt-2 font-display text-3xl leading-tight">{title}</h3>
       <ul className="mt-8 space-y-3">
         {points.map((p) => (
           <li key={p} className="flex items-center gap-3 text-[0.95rem]">
-            <Check className={dark ? "size-4 text-ivory/50" : "size-4 text-stone"} aria-hidden />
+            <Check className={dark ? "size-4 text-ivory/70" : "size-4 text-accent"} aria-hidden />
             {p}
           </li>
         ))}

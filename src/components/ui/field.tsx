@@ -2,15 +2,28 @@ import type { ComponentProps, ReactNode } from "react";
 import { CircleAlert } from "lucide-react";
 import { cn } from "@/lib/cn";
 
+/**
+ * Form controls use the stronger `field` border so their edges are clearly
+ * visible (WCAG 1.4.11), with an ink border + soft ring on focus and a
+ * danger border when invalid.
+ */
 const control =
-  "w-full rounded-xl border border-line bg-paper px-4 text-[0.95rem] text-ink placeholder:text-stone transition-colors hover:border-stone focus:border-ink focus:outline-none focus-visible:outline-none focus:ring-4 focus:ring-ink/5 disabled:cursor-not-allowed disabled:bg-cream disabled:text-muted aria-[invalid=true]:border-danger aria-[invalid=true]:focus:ring-danger/10";
+  "w-full rounded-xl border border-field bg-paper px-4 text-[0.95rem] text-ink shadow-[0_1px_0_rgb(27_25_22/0.03)] transition-[border-color,box-shadow] hover:border-stone focus:border-ink focus:outline-none focus-visible:outline-none focus:ring-[3px] focus:ring-ink/10 disabled:cursor-not-allowed disabled:bg-cream disabled:text-muted aria-[invalid=true]:border-danger aria-[invalid=true]:focus:ring-danger/15";
 
 export function Label({ className, ...props }: ComponentProps<"label">) {
-  return <label className={cn("block text-sm font-semibold text-ink", className)} {...props} />;
+  return <label className={cn("block text-sm font-medium text-ink", className)} {...props} />;
 }
 
-export function Input({ className, ...props }: ComponentProps<"input">) {
-  return <input className={cn(control, "h-12", className)} {...props} />;
+export function Input({ className, icon, ...props }: ComponentProps<"input"> & { icon?: ReactNode }) {
+  if (!icon) return <input className={cn(control, "h-12", className)} {...props} />;
+  return (
+    <div className="relative">
+      <span className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-stone [&_svg]:size-[1.05rem] [&_svg]:stroke-[1.75]" aria-hidden>
+        {icon}
+      </span>
+      <input className={cn(control, "h-12 pl-11", className)} {...props} />
+    </div>
+  );
 }
 
 export function Textarea({ className, ...props }: ComponentProps<"textarea">) {
@@ -22,7 +35,7 @@ export function Select({ className, children, ...props }: ComponentProps<"select
     <select
       className={cn(
         control,
-        "h-12 appearance-none bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 fill=%22none%22 stroke=%22%236b6358%22 stroke-width=%222%22 viewBox=%220 0 24 24%22><path d=%22m6 9 6 6 6-6%22/></svg>')] bg-[length:14px] bg-[right_1rem_center] bg-no-repeat pr-10",
+        "h-12 appearance-none bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 fill=%22none%22 stroke=%22%235c554c%22 stroke-width=%222%22 viewBox=%220 0 24 24%22><path d=%22m6 9 6 6 6-6%22/></svg>')] bg-[length:14px] bg-[right_1rem_center] bg-no-repeat pr-10",
         className,
       )}
       {...props}
@@ -57,6 +70,7 @@ export function Field({
   hint,
   error,
   optional,
+  labelAction,
   children,
   className,
 }: {
@@ -65,6 +79,8 @@ export function Field({
   hint?: ReactNode;
   error?: string;
   optional?: boolean;
+  /** Small link or control shown at the right of the label row. */
+  labelAction?: ReactNode;
   children: ReactNode;
   className?: string;
 }) {
@@ -72,7 +88,7 @@ export function Field({
     <div className={className}>
       <div className="mb-2 flex items-baseline justify-between gap-3">
         <Label htmlFor={id}>{label}</Label>
-        {optional ? <span className="text-xs text-muted">Optional</span> : null}
+        {labelAction ?? (optional ? <span className="text-xs text-muted">Optional</span> : null)}
       </div>
       {children}
       {hint && !error ? <FieldHint id={`${id}-hint`}>{hint}</FieldHint> : null}

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useState } from "react";
+import { Mail } from "lucide-react";
 import { signIn, type SignInState } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Notice } from "@/components/ui/feedback";
@@ -22,17 +23,31 @@ export function LoginForm({ next }: { next: string }) {
         </Notice>
       ) : null}
       <Field id="email" label="Email" error={fe.email}>
-        <Input type="email" name="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} {...describedBy("email", { error: fe.email })} />
+        <Input
+          type="email"
+          name="email"
+          autoComplete="email"
+          placeholder="you@example.com"
+          required
+          icon={<Mail />}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          {...describedBy("email", { error: fe.email })}
+        />
       </Field>
-      <Field id="password" label="Password" error={fe.password}>
+      <Field
+        id="password"
+        label="Password"
+        error={fe.password}
+        labelAction={
+          <Link href="/forgot-password" className="text-sm font-medium text-muted underline-offset-4 hover:text-ink hover:underline">
+            Forgot password?
+          </Link>
+        }
+      >
         <PasswordInput name="password" autoComplete="current-password" required {...describedBy("password", { error: fe.password })} />
       </Field>
-      <div className="flex justify-end">
-        <Link href="/forgot-password" className="text-sm font-medium text-muted hover:text-ink">
-          Forgot your password?
-        </Link>
-      </div>
-      <Button type="submit" size="lg" className="w-full" loading={pending} loadingText="Signing in…">
+      <Button type="submit" size="lg" className="mt-2 w-full" loading={pending} loadingText="Signing in…">
         Sign in
       </Button>
     </form>

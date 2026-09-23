@@ -14,12 +14,12 @@ export async function SiteHeader() {
   const viewer = await getViewer();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line/70 bg-ivory/85 backdrop-blur-md">
-      <div className="mx-auto flex h-18 max-w-7xl items-center justify-between gap-6 px-5 md:px-8">
+    <header className="sticky top-0 z-40 border-b border-line bg-ivory">
+      <div className="mx-auto flex h-18 max-w-6xl items-center justify-between gap-6 px-5 md:px-8">
         <Logo />
         <nav aria-label="Main" className="hidden items-center gap-8 md:flex">
           {NAV.map((item) => (
-            <Link key={item.href} href={item.href} className="text-sm font-medium text-muted transition hover:text-ink">
+            <Link key={item.href} href={item.href} className="text-sm font-medium text-muted transition-colors hover:text-ink">
               {item.label}
             </Link>
           ))}

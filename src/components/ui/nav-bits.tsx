@@ -38,7 +38,7 @@ export function LinkTabs({
                 )}
               >
                 {t.label}
-                {typeof t.count === "number" ? <span className="text-xs text-stone tabular-nums">{t.count}</span> : null}
+                {typeof t.count === "number" ? <span className="text-xs text-muted tabular-nums">{t.count}</span> : null}
               </Link>
             </li>
           );

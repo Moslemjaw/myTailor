@@ -49,7 +49,7 @@ export function OrderProgress({
                 "relative z-10 flex size-8 shrink-0 items-center justify-center rounded-full border text-xs font-semibold transition",
                 done && "border-ink bg-ink text-ivory",
                 active && "border-accent bg-accent-soft text-accent-strong ring-4 ring-accent/10",
-                !done && !active && "border-line bg-paper text-stone",
+                !done && !active && "border-field bg-paper text-muted",
               )}
             >
               {done ? <Check className="size-4" aria-hidden /> : i + 1}

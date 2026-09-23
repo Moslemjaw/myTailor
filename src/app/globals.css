@@ -10,15 +10,17 @@
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-instrument), ui-serif, Georgia, serif;
 
-  --color-ivory: #faf7f2;
-  --color-paper: #fffdf9;
-  --color-cream: #f3ede3;
-  --color-sand: #e7decf;
-  --color-line: #e9e2d7;
-  --color-stone: #a39a8e;
-  --color-muted: #6b6358;
+  /* Page and surfaces are now clearly separated: cards read as cards. */
+  --color-ivory: #f6f2eb;
+  --color-paper: #fffdfa;
+  --color-cream: #eee7dc;
+  --color-sand: #e0d6c6;
+  --color-line: #e2d9cc;
+  --color-field: #cbc0b0; /* form control borders — stronger than decorative lines */
+  --color-stone: #8a8175; /* icons and dividers only (≥3:1) */
+  --color-muted: #5c554c; /* secondary text (≈6:1 on ivory) */
   --color-charcoal: #2e2a26;
-  --color-ink: #1d1b18;
+  --color-ink: #1b1916;
 
   --color-accent: #8a5a2e;
   --color-accent-strong: #6f4722;
@@ -65,6 +67,10 @@
   ::selection {
     background: var(--color-accent-soft);
     color: var(--color-ink);
+  }
+  ::placeholder {
+    color: #9a9084;
+    opacity: 1;
   }
   :focus-visible {
     outline: 2px solid var(--color-accent);

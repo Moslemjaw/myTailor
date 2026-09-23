@@ -8,11 +8,11 @@ export const metadata: Metadata = { title: "Reset your password" };
 export default function ForgotPasswordPage() {
   return (
     <>
-      <Link href="/login" className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-muted hover:text-ink">
+      <Link href="/login" className="mb-8 inline-flex items-center gap-1.5 text-sm font-medium text-muted hover:text-ink">
         <ArrowLeft className="size-4" aria-hidden /> Back to sign in
       </Link>
-      <h1 className="text-2xl font-semibold tracking-[-0.02em] text-ink">Forgot your password?</h1>
-      <p className="mt-1.5 text-muted">Enter your email and we’ll send you a link to choose a new one.</p>
+      <h1 className="text-[1.75rem] font-semibold tracking-[-0.02em] text-ink">Forgot your password?</h1>
+      <p className="mt-1.5 text-muted">We’ll email you a link to choose a new one.</p>
       <ForgotPasswordForm />
     </>
   );

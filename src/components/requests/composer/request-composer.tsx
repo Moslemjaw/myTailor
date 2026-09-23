@@ -215,7 +215,7 @@ export function RequestComposer({
                   <span
                     className={cn(
                       "flex size-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold",
-                      done ? "border-ink bg-ink text-ivory" : current ? "border-ink text-ink" : "border-line text-stone",
+                      done ? "border-ink bg-ink text-ivory" : current ? "border-ink text-ink" : "border-field text-muted",
                     )}
                   >
                     {done ? <Check className="size-3.5" aria-hidden /> : i + 1}

@@ -24,7 +24,7 @@ export function SiteFooter() {
             ))}
           </ul>
         </nav>
-        <p className="text-sm text-stone">© {new Date().getFullYear()} MyTailor</p>
+        <p className="text-sm text-muted">© {new Date().getFullYear()} MyTailor</p>
       </div>
     </footer>
   );
