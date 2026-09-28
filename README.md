@@ -5,6 +5,13 @@ A two-sided marketplace for custom clothing:
 
 Next.js 16 (App Router) · Tailwind CSS 4 · Supabase (Postgres, Auth, Storage, Realtime) · OpenRouter (server-side only).
 
+**Live:** https://mytailor-sigma.vercel.app
+
+## Assessment write-ups
+
+- [Tampering Test](docs/TAMPERING_TEST.md) — the five attacks, what happened, and why each fails ([raw run](docs/tampering-results.md))
+- [Schema, access control & stretch goal](docs/DESIGN_DECISIONS.md)
+
 ## Setup
 
 1. `npm install`
