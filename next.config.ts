@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
 
 const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
   ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
@@ -19,4 +20,9 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
 };
 
-export default nextConfig;
+// `*.dev.tsx` pages (the class demo at /demo/secrets) exist only under `next dev`.
+export default function config(phase: string): NextConfig {
+  return phase === PHASE_DEVELOPMENT_SERVER
+    ? { ...nextConfig, pageExtensions: ["dev.tsx", "tsx", "ts", "jsx", "js"] }
+    : nextConfig;
+}
